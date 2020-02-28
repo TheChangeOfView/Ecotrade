@@ -1,0 +1,20 @@
+area            subarea      port       |    item    buy    sell                        category    subcategory
+subarea         port                    |    item    buy    sell    area                category
+port                                    |    item    buy    sell    area    subarea     category    subcategory
+item                                    |    port    buy    sell    area    subarea     category    subcategory
+category        subcategory             |    item    buy    sell    area    subarea
+subcategory                             |    item    buy    sell    area    subarea     category
+
+
+
+
+item        port        buy     sell        cat         sbucat
+port        area        subarea
+
+
+item
+attribute
+subattribute
+area
+subarea
+port
