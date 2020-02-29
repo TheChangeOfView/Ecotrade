@@ -27,9 +27,26 @@ class general:
 
         return lang
 
+class project:
+
+    def load(self, filePath):
+
+        with open(filePath, "r") as file:
+
+            data = json.load(file)
+
+        return data
+
+        """itemData = item().get(filePath)
+        areaData = area().get(filePath)
+        sareaData = subarea().get(filePath)
+        attrData = attribute().get(filePath)
+
+        return itemData, areaData, sareaData, attrData
+
 class item:
 
-    def get(self, project):
+    def get(self, dataPath):
 
         if project == "None":
 
@@ -37,7 +54,7 @@ class item:
 
         else:
 
-            fileData = ("save/" + project + ".json")
+            fileData = (dataPath)
 
             with open(fileData) as file:
 
@@ -45,11 +62,11 @@ class item:
 
             items = data["item"]
 
-            return 0
+            return items
 
 class area:
 
-    def get(self, project):
+    def get(self, dataPath):
 
         if project == "None":
 
@@ -57,7 +74,7 @@ class area:
 
         else:
 
-            fileData = ("save/" + project + ".json")
+            fileData = (dataPath)
 
             with open(fileData) as file:
 
@@ -65,11 +82,11 @@ class area:
 
             areas = data["area"]
 
-            return 0
+            return areas
 
 class subarea:
 
-    def get(self, project):
+    def get(self, dataPath):
 
         if project == "None":
 
@@ -77,19 +94,19 @@ class subarea:
 
         else:
 
-            fileData = ("save/" + project + ".json")
+            fileData = (dataPath)
 
             with open(fileData) as file:
 
                 data = json.load(file)
 
-            subarea = data["sarea"]
+            subareas = data["sarea"]
 
-            return 0
+            return subareas
 
 class attribute:
 
-    def get(self, project):
+    def get(self, dataPath):
 
         if project == "None":
 
@@ -97,7 +114,7 @@ class attribute:
 
         else:
 
-            fileData = ("save/" + project + ".json")
+            fileData = (dataPath)
 
             with open(fileData) as file:
 
@@ -105,4 +122,4 @@ class attribute:
 
             attributes = data["attr"]
 
-            return 0
+            return attributes"""

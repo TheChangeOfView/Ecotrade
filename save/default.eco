@@ -1,0 +1,136 @@
+{
+    "name": "default",
+    "item": {
+        "item000000": {
+            "name": "9mm-Light",
+            "port": {
+                "Tethys": "50-5",
+                "Phoebe": "52-7",
+                "Rhea": "54-9",
+                "Atlas": "56-11",
+                "Perses": "58-13"
+            },
+            "attr": "Gunnery",
+            "sattr": "Ammunition"
+        },
+        "item000001": {
+            "name": "50mm-Light",
+            "port": {
+                "Hyperion": "100-10",
+                "Phoebe": "102-12",
+                "Cronus": "104-14",
+                "Astraeus": "106-16"
+            },
+            "attr": "Gunnery",
+            "sattr": "Ammunition"
+        },
+        "item000002": {
+            "name": "Pistol",
+            "port": {
+                "Cronus": "200-50",
+                "Phoebe": "202-52"
+            },
+            "attr": "Gunnery",
+            "sattr": "Guns"
+        },
+        "item000003": {
+            "name": "Switcher",
+            "port": {
+                "Coeus": "2000-1000",
+                "Astraeus": "2500-1000"
+            },
+            "attr": "Ships",
+            "sattr": "Causo-class"
+        },
+        "item000004": {
+            "name": "Charger",
+            "port": {
+                "Coeus": "4000-1500",
+                "Astraeus": "4000-2000"
+            },
+            "attr": "Ships",
+            "sattr": "Hudo-class"
+        }
+    },
+    "area": {
+        "area000000": {
+            "name": "Gaia",
+            "sarea": ["Ourea", "Pontus"]
+        },
+        "area000001": {
+            "name": "Nyx",
+            "sarea": ["Thanatos", "Nemesis"]
+        }
+    },
+    "sarea": {
+        "sarea000000": {
+            "name": "Ourea",
+            "port": ["Tethys", "Hyperion"]
+        },
+        "sarea000001": {
+            "name": "Pontus",
+            "port": ["Coeus", "Phoebe"]
+        },
+        "sarea000002": {
+            "name": "Thanatos",
+            "port": ["Cronus", "Rhea"]
+        },
+        "sarea000003": {
+            "name": "Nemesis",
+            "port": ["Atlas", "Perses", "Astraeus"]
+        }
+    },
+    "port": {
+        "port000000": {
+            "name": "Tethys"
+        },
+        "port000001": {
+            "name": "Hyperion"
+        },
+        "port000002": {
+            "name": "Coeus"
+        },
+        "port000003": {
+            "name": "Phoebe"
+        },
+        "port000004": {
+            "name": "Cronus"
+        },
+        "port000005": {
+            "name": "Rhea"
+        },
+        "port000006": {
+            "name": "Atlas"
+        },
+        "port000007": {
+            "name": "Perses"
+        },
+        "port000008": {
+            "name": "Astraeus"
+        }
+    },
+    "attr": {
+        "attr000000": {
+            "name": "Gunnery",
+            "sattr": ["Guns", "Ammunition"]
+        },
+        "attr000001": {
+            "name": "Ships",
+            "sattr": ["Hudo-class", "Causo-class"]
+        }
+    },
+    "sattr": {
+        "sattr000000": {
+            "name": "Guns"
+        },
+        "sattr000001": {
+            "name": "Ammunition"
+        },
+        "sattr000002": {
+            "name": "Hudo-class"
+        },
+        "sattr000003": {
+            "name": "Causo-class"
+        }
+    }
+}
