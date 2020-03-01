@@ -5,7 +5,7 @@
 # --- Imports
 
 import tkinter as tk
-from tkinter import ttk, filedialog
+from tkinter import ttk, filedialog, simpledialog, messagebox
 import os
 import sys
 from data.scripts import utilities as util
@@ -16,6 +16,7 @@ from data.scripts import fileHandling as hand
 infoPath = "data/info.ini"
 settingsPath = "data/settings.ini"
 projectData = {"name": None}
+projectChanges = False
 
 ######################################
 # ---------------------------------- #
@@ -24,14 +25,24 @@ projectData = {"name": None}
 def main(): # Main Function
 
     root = tk.Tk()
+    root.resizable(height = False, width = False)
+
+    windowWidth = 1050
+    windowHeight = 950
+    
+    positionRight = int(root.winfo_screenwidth()/2 - windowWidth/2)
+    positionDown = int(root.winfo_screenheight()/2 - windowHeight/2)
+
+    root.geometry("+{}+{}".format(positionRight, positionDown))
+
     mainScreen = scrMain(master = root)
-    mainScreen.mainloop()
+    root.mainloop()
 
 ######################################
 # ---------------------------------- #
 ######################################
 
-class scrMain(ttk.Frame): # Main GUI
+class scrMain(): # Main GUI
     
     def __init__(self, master = None): # GUI Init
         
@@ -46,14 +57,14 @@ class scrMain(ttk.Frame): # Main GUI
         activeOffer = ""
         itemImage = tk.PhotoImage(file = "data/noImage.pgm")
         
-        sortingOptions = (lang["item"], lang["area"], lang["subarea"], lang["port"], lang["attribute"], lang["subattribute"])
+        sortingOptions = (lang["titleItem"], lang["titleArea"], lang["titleSubarea"], lang["titlePort"], lang["titleAttribute"], lang["titleSubattribute"])
         
         #####################################
         # --------- Create Window --------- #
         #####################################
-    
-        super().__init__(master)
+
         self.master = master
+        self.frame = ttk.Frame(self.master)
         
         # --- Master Settings
         
@@ -65,7 +76,7 @@ class scrMain(ttk.Frame): # Main GUI
         
         # --- Listboxes Masterframe
         
-        self.FRM_listboxes = ttk.Frame(master)
+        self.FRM_listboxes = ttk.Frame(self.frame)
         
         # --- First Listbox (Upper Left)
         
@@ -96,7 +107,7 @@ class scrMain(ttk.Frame): # Main GUI
 
         # --- Offer Box (Lower) max. 35 char
 
-        TRW_offerColumnList = (f"{lang['item']} / {lang['port']}", lang["buy"], lang["sell"])
+        TRW_offerColumnList = (f"{lang['titleItem']} / {lang['titlePort']}", lang["titleBuy"], lang["titleSell"])
 
         self.TRW_offer = ttk.Treeview(self.FRM_listboxes, columns = TRW_offerColumnList, show = "headings", height = 25)
 
@@ -109,28 +120,17 @@ class scrMain(ttk.Frame): # Main GUI
 
         self.SLB_offer = ttk.Scrollbar(self.FRM_listboxes, orient = tk.VERTICAL, command = self.TRW_offer.yview)
         self.TRW_offer["yscrollcommand"] = self.SLB_offer.set
-
-        items = [                                               # to be deleted
-
-            ("test", "5", "1"),
-            ("another test", "50", "30")
-
-        ]
-
-        for i in items:
-
-            self.TRW_offer.insert("", "end", values = i)
         
         # --- Sorting Combobox
         
-        self.LBL_sorting = ttk.Label(master, text = lang["sort"])
-        self.CBB_sorting = ttk.Combobox(master, state = "readonly", width = 25, values = sortingOptions)       
+        self.LBL_sorting = ttk.Label(self.frame, text = lang["browserSort"])
+        self.CBB_sorting = ttk.Combobox(self.frame, state = "readonly", width = 25, values = sortingOptions)       
         self.CBB_sorting.current(0)
         self.CBB_sorting.bind("<<ComboboxSelected>>", self.CBB_Sorting_callback)
         
         # --- Attributes Masterframe
         
-        self.LBF_Attributes = ttk.Labelframe(master, text = lang["attributes"])
+        self.LBF_Attributes = ttk.Labelframe(self.frame, text = lang["attributesTitle"])
         
         # --- Attributes
         
@@ -139,36 +139,36 @@ class scrMain(ttk.Frame): # Main GUI
         
         self.FRM_value = ttk.Frame(self.LBF_Attributes)
         
-        self.LBL_itemBuy = ttk.Label(self.FRM_value, text = lang["buy"])
+        self.LBL_itemBuy = ttk.Label(self.FRM_value, text = lang["attributesBuy"])
         self.itemBuyActiveTextvariable = tk.StringVar()
         self.ETY_itemBuyActive = ttk.Entry(self.FRM_value, width = 12, state = "disabled", textvariable = self.itemBuyActiveTextvariable, justify = "center")
         
-        self.LBL_itemSell = ttk.Label(self.FRM_value, text = lang["sell"])
+        self.LBL_itemSell = ttk.Label(self.FRM_value, text = lang["attributesSell"])
         self.itemSellActiveTextvariable = tk.StringVar()
         self.ETY_itemSellActive = ttk.Entry(self.FRM_value, width = 12, state = "disabled", textvariable = self.itemSellActiveTextvariable, justify = "center")
         
         self.FRM_name = ttk.Frame(self.LBF_Attributes)
-        self.LBL_name = ttk.Label(self.FRM_name, text = lang["item-name"], width = 35)
+        self.LBL_name = ttk.Label(self.FRM_name, text = lang["attributesItem"], width = 35)
         self.TXT_nameActive = tk.Text(self.FRM_name, width = 20, height = 3, state = "disabled")
         
         self.FRM_port = ttk.Frame(self.LBF_Attributes)
-        self.LBL_port = ttk.Label(self.FRM_port, text = lang["item-port"], width = 35)
+        self.LBL_port = ttk.Label(self.FRM_port, text = lang["attributesPort"], width = 35)
         self.TXT_portActive = tk.Text(self.FRM_port, width = 20, height = 3, state = "disabled")
         
         self.FRM_area = ttk.Frame(self.LBF_Attributes)
-        self.LBL_area = ttk.Label(self.FRM_area, text = lang["item-area"], width = 35)
+        self.LBL_area = ttk.Label(self.FRM_area, text = lang["attributesArea"], width = 35)
         self.TXT_areaActive = tk.Text(self.FRM_area, width = 20, height = 3, state = "disabled")
         
         self.FRM_subarea = ttk.Frame(self.LBF_Attributes)
-        self.LBL_subarea = ttk.Label(self.FRM_subarea, text = lang["item-subarea"], width = 35)
+        self.LBL_subarea = ttk.Label(self.FRM_subarea, text = lang["attributesSubarea"], width = 35)
         self.TXT_subareaActive = tk.Text(self.FRM_subarea, width = 20, height = 3, state = "disabled")
         
         self.FRM_attribute = ttk.Frame(self.LBF_Attributes)
-        self.LBL_attribute = ttk.Label(self.FRM_attribute, text = lang["item-attribute"], width = 35)
+        self.LBL_attribute = ttk.Label(self.FRM_attribute, text = lang["attributesAttribute"], width = 35)
         self.TXT_attributeActive = tk.Text(self.FRM_attribute, width = 20, height = 3, state = "disabled")
         
         self.FRM_subattribute = ttk.Frame(self.LBF_Attributes)
-        self.LBL_subattribute = ttk.Label(self.FRM_subattribute, text = lang["item-subattribute"], width = 35)
+        self.LBL_subattribute = ttk.Label(self.FRM_subattribute, text = lang["attributesSubattribute"], width = 35)
         self.TXT_subattributeActive = tk.Text(self.FRM_subattribute, width = 20, height = 3, state = "disabled")
         
         defaultItem = {"buy": "-", "sell": "-", "name": "-", "port": "-", "area": "-", "subarea": "-", "attribute": "-", "subattribute": "-"}
@@ -177,20 +177,20 @@ class scrMain(ttk.Frame): # Main GUI
         
         # --- Buttons Masterframe
         
-        self.FRM_buttons = ttk.Frame(master)
+        self.FRM_buttons = ttk.Frame(self.frame)
         self.FRM_Subbuttons = ttk.Frame(self.FRM_buttons)
         
         # --- Buttons
         
-        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["add"], width = 34, command = None)
-        self.BTN_edit = ttk.Button(self.FRM_buttons, text = lang["edit"], width = 16, command = None)
-        self.BTN_remove = ttk.Button(self.FRM_buttons, text = lang["remove"], width = 16, command = None)
-        self.BTN_new = ttk.Button(self.FRM_Subbuttons, text = lang["new"], width = 34, command = None)
-        self.BTN_save = ttk.Button(self.FRM_Subbuttons, text = lang["save"], width = 16, command = None)
-        self.BTN_load = ttk.Button(self.FRM_Subbuttons, text = lang["load"], width = 16, command = self.loadProject)
-        self.BTN_delete = ttk.Button(self.FRM_Subbuttons, text = lang["delete"], width = 34, command = None)
-        self.BTN_settings = ttk.Button(self.FRM_buttons, text = lang["settings"], width = 16, command = None)
-        self.BTN_quit = ttk.Button(self.FRM_buttons, text = lang["quit"], width = 16, command = self.quit)
+        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonObjectAdd"], width = 34, command = self.objectAdd)
+        self.BTN_edit = ttk.Button(self.FRM_buttons, text = lang["buttonObjectEdit"], width = 16, command = self.objectEdit)
+        self.BTN_remove = ttk.Button(self.FRM_buttons, text = lang["buttonObjectRemove"], width = 16, command = None)
+        self.BTN_new = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectNew"], width = 34, command = self.projectNew)
+        self.BTN_save = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectSave"], width = 16, command = None)
+        self.BTN_load = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectLoad"], width = 16, command = self.projectLoad)
+        self.BTN_delete = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectDelete"], width = 34, command = None)
+        self.BTN_settings = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralSettings"], width = 16, command = self.openSettings)
+        self.BTN_quit = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralQuit"], width = 16, command = self.programQuit)
         
         ######################################
         # --------- Allign Widgets --------- #
@@ -198,7 +198,7 @@ class scrMain(ttk.Frame): # Main GUI
         
         # --- Master Grid
         
-        self.grid(column = 0, row = 0)
+        self.frame.grid(column = 0, row = 0)
         
         # --- First Listbox (Upper Left)
         
@@ -299,7 +299,27 @@ class scrMain(ttk.Frame): # Main GUI
         
         # --- Final Pack
         
-        self.pack
+        self.frame.pack()
+
+        self.LBX_stSelect.delete(0, tk.END)
+        self.LBX_ndSelect.delete(0, tk.END)
+        self.LBX_rdSelect.delete(0, tk.END)
+        self.TRW_offer.delete(*self.TRW_offer.get_children())
+
+        projectData.clear()
+
+        projectData["name"] = "active"
+
+        projectData["item"] = dict()
+        projectData["area"] = dict()
+        projectData["sarea"] = dict()
+        projectData["port"] = dict()
+        projectData["attr"] = dict()
+        projectData["sattr"] = dict()
+
+        self.browserSetFirstSection()
+
+        self.CBB_Sorting_callback(None)
 
     def CBB_Sorting_callback(self, event):
 
@@ -318,7 +338,7 @@ class scrMain(ttk.Frame): # Main GUI
         
         if value == 0: #Item
             
-            self.LBL_stSelect.config(text = lang["item"])
+            self.LBL_stSelect.config(text = lang["titleItem"])
             self.LBL_ndSelect.config(text = "-")
             self.LBL_rdSelect.config(text = "-")
             
@@ -328,9 +348,9 @@ class scrMain(ttk.Frame): # Main GUI
         
         elif value == 1: #Area
             
-            self.LBL_stSelect.config(text = lang["area"])
-            self.LBL_ndSelect.config(text = lang["subarea"])
-            self.LBL_rdSelect.config(text = lang["port"])
+            self.LBL_stSelect.config(text = lang["titleArea"])
+            self.LBL_ndSelect.config(text = lang["titleSubarea"])
+            self.LBL_rdSelect.config(text = lang["titlePort"])
             
             self.LBX_stSelect.config(state = "normal")
             self.LBX_ndSelect.config(state = "normal")
@@ -338,8 +358,8 @@ class scrMain(ttk.Frame): # Main GUI
         
         elif value == 2: #Subarea
             
-            self.LBL_stSelect.config(text = lang["subarea"])
-            self.LBL_ndSelect.config(text = lang["port"])
+            self.LBL_stSelect.config(text = lang["titleSubarea"])
+            self.LBL_ndSelect.config(text = lang["titlePort"])
             self.LBL_rdSelect.config(text = "-")
             
             self.LBX_stSelect.config(state = "normal")
@@ -348,7 +368,7 @@ class scrMain(ttk.Frame): # Main GUI
         
         elif value == 3: #Port
             
-            self.LBL_stSelect.config(text = lang["port"])
+            self.LBL_stSelect.config(text = lang["titlePort"])
             self.LBL_ndSelect.config(text = "-")
             self.LBL_rdSelect.config(text = "-")
             
@@ -358,9 +378,9 @@ class scrMain(ttk.Frame): # Main GUI
         
         elif value == 4: #Attribute
             
-            self.LBL_stSelect.config(text = lang["attribute"])
-            self.LBL_ndSelect.config(text = lang["subattribute"])
-            self.LBL_rdSelect.config(text = lang["item"])
+            self.LBL_stSelect.config(text = lang["titleAttribute"])
+            self.LBL_ndSelect.config(text = lang["titleSubattribute"])
+            self.LBL_rdSelect.config(text = lang["titleItem"])
             
             self.LBX_stSelect.config(state = "normal")
             self.LBX_ndSelect.config(state = "normal")
@@ -368,8 +388,8 @@ class scrMain(ttk.Frame): # Main GUI
         
         elif value == 5: #Subattribute
             
-            self.LBL_stSelect.config(text = lang["subattribute"])
-            self.LBL_ndSelect.config(text = lang["item"])
+            self.LBL_stSelect.config(text = lang["titleSubattribute"])
+            self.LBL_ndSelect.config(text = lang["titleItem"])
             self.LBL_rdSelect.config(text = "-")
             
             self.LBX_stSelect.config(state = "normal")
@@ -1073,7 +1093,57 @@ class scrMain(ttk.Frame): # Main GUI
 
                 pass
 
-    def loadProject(self):
+    def objectAdd(self):
+
+        self.addObjectScreen = tk.Toplevel(self.master)
+        self.addObjectScreen.grab_set()
+
+        self.addObj = scrObjAdd(self.addObjectScreen)
+
+    def objectEdit(self):
+
+        self.editObjectScreen = tk.Toplevel(self.master)
+        self.editObjectScreen.grab_set()
+
+        self.editObj = scrObjEdit(self.editObjectScreen)
+
+    def projectNew(self):
+
+        global projectData
+
+        lang = hand.general().getLang(settingsPath)
+
+        alertMsgLine1, alertMsgLine2 = str(lang["promptNewProjectAlertText"]).split("/")
+
+        alert = messagebox.askokcancel(title = lang["promptNewProjectAlert"], message = "\n\n".join([alertMsgLine1, alertMsgLine2]))
+
+        if alert == False:
+
+            return -1
+
+        else:
+
+            self.LBX_stSelect.delete(0, tk.END)
+            self.LBX_ndSelect.delete(0, tk.END)
+            self.LBX_rdSelect.delete(0, tk.END)
+            self.TRW_offer.delete(*self.TRW_offer.get_children())
+
+            projectData.clear()
+
+            projectData["name"] = "active"
+
+            projectData["item"] = dict()
+            projectData["area"] = dict()
+            projectData["sarea"] = dict()
+            projectData["port"] = dict()
+            projectData["attr"] = dict()
+            projectData["sattr"] = dict()
+
+            self.browserSetFirstSection
+
+            projectChanges = False
+
+    def projectLoad(self):
 
         global projectData
 
@@ -1083,7 +1153,7 @@ class scrMain(ttk.Frame): # Main GUI
         filePath = filedialog.askopenfilename(
             
             initialdir = (sys.path[0] + "\\save"),
-            title = lang["loadProj"],
+            title = lang["promptLoadProject"],
             filetypes = (
 
                 (f"{info['name']} Database File",f"*{info['dbExtension']}"),
@@ -1099,8 +1169,39 @@ class scrMain(ttk.Frame): # Main GUI
 
         projectData = hand.project().load(filePath)
 
+        projectData["name"] = "active"
+
         self.browserSetFirstSection()
-        
+
+    def openSettings(self):
+
+        self.settingsScreen = tk.Toplevel(self.master)
+        self.settingsScreen.grab_set()
+
+        self.settings = scrSettings(self.settingsScreen)
+
+    def programQuit(self):
+
+        lang = hand.general().getLang(settingsPath)
+
+        if projectChanges == True:
+
+            alertMsgLine1, alertMsgLine2 = str(lang["promptQuitProgramAlertText"]).split("/")
+
+            alert = messagebox.askyesno(title = lang["promptQuitProgramAlert"], message = "\n\n".join([alertMsgLine1, alertMsgLine2]))
+
+            if alert == True:
+
+                self.frame.quit()
+
+            else:
+
+                return -1
+
+        else:
+
+            self.frame.quit()
+
     def setItemInfo(self, item):
         
         self.itemBuyActiveTextvariable.set(item["buy"])
@@ -1148,7 +1249,7 @@ class scrMain(ttk.Frame): # Main GUI
         self.LBX_rdSelect.delete(0, tk.END)
         self.TRW_offer.delete(*self.TRW_offer.get_children())
 
-        if activeSorting == lang["item"]:
+        if activeSorting == lang["titleItem"]:
 
             sortList = list()
 
@@ -1162,7 +1263,7 @@ class scrMain(ttk.Frame): # Main GUI
 
                 self.LBX_stSelect.insert(tk.END, entry)
             
-        elif activeSorting == lang["area"]:
+        elif activeSorting == lang["titleArea"]:
 
             sortList = list()
 
@@ -1180,7 +1281,7 @@ class scrMain(ttk.Frame): # Main GUI
 
                 self.LBX_stSelect.insert(tk.END, entry)
 
-        elif activeSorting == lang["subarea"]:
+        elif activeSorting == lang["titleSubarea"]:
 
             sortList = list()
 
@@ -1198,7 +1299,7 @@ class scrMain(ttk.Frame): # Main GUI
 
                 self.LBX_stSelect.insert(tk.END, entry)
 
-        elif activeSorting == lang["port"]:
+        elif activeSorting == lang["titlePort"]:
 
             sortList = list()
 
@@ -1212,7 +1313,7 @@ class scrMain(ttk.Frame): # Main GUI
 
                 self.LBX_stSelect.insert(tk.END, entry)
 
-        elif activeSorting == lang["attribute"]:
+        elif activeSorting == lang["titleAttribute"]:
 
             sortList = list()
 
@@ -1230,7 +1331,7 @@ class scrMain(ttk.Frame): # Main GUI
 
                 self.LBX_stSelect.insert(tk.END, entry)
 
-        elif activeSorting == lang["subattribute"]:
+        elif activeSorting == lang["titleSubattribute"]:
 
             sortList = list()
 
@@ -1247,6 +1348,219 @@ class scrMain(ttk.Frame): # Main GUI
             for entry in sortList:
 
                 self.LBX_stSelect.insert(tk.END, entry)
+
+class scrObjAdd:
+
+    def __init__(self, master):
+
+        spacer = "                                                                                            "
+
+        lang = hand.general().getLang(settingsPath)
+
+        self.master = master
+        self.frame = ttk.Frame(self.master)
+        
+        ########################################
+        # --------- Creating Widgets --------- #
+        ########################################
+
+        # --- Register ---
+
+        self.NTB_main = ttk.Notebook(self.frame)
+
+        self.FRM_ntbItem = ttk.Frame(self.NTB_main)
+        self.FRM_ntbArea = ttk.Frame(self.NTB_main)
+        self.FRM_ntbSarea = ttk.Frame(self.NTB_main)
+        self.FRM_ntbPort = ttk.Frame(self.NTB_main)
+        self.FRM_ntbAttr = ttk.Frame(self.NTB_main)
+        self.FRM_ntbSattr = ttk.Frame(self.NTB_main)
+
+        self.NTB_main.add(self.FRM_ntbItem, text = lang["titleItem"])
+        self.NTB_main.add(self.FRM_ntbArea, text = lang["titleArea"])
+        self.NTB_main.add(self.FRM_ntbSarea, text = lang["titleSubarea"])
+        self.NTB_main.add(self.FRM_ntbPort, text = lang["titlePort"])
+        self.NTB_main.add(self.FRM_ntbAttr, text = lang["titleAttribute"])
+        self.NTB_main.add(self.FRM_ntbSattr, text = lang["titleSubattribute"])
+
+        # --- Register #01 - Items --- name, available Ports with value, attr, subattr
+
+        self.LBL_nbtItemSpacer01 = ttk.Label(self.FRM_ntbItem, text = spacer)
+
+        self.LBL_nbtItemName = ttk.Label(self.FRM_ntbItem, text = lang["windowAddNewName"])
+        self.ETY_nbtItemName = ttk.Entry(self.FRM_ntbItem, width = 23)
+
+        self.LBL_nbtItemAttr = ttk.Label(self.FRM_ntbItem, text = lang["titleAttribute"])
+        self.CBB_nbtItemAttr = ttk.Combobox(self.FRM_ntbItem)
+
+        self.LBL_nbtItemSattr = ttk.Label(self.FRM_ntbItem, text = lang["titleSubattribute"])
+        self.CBB_nbtItemSattr = ttk.Combobox(self.FRM_ntbItem)
+
+        # --- Register #02 - Area --- name
+
+        self.LBL_nbtAreaSpacer01 = ttk.Label(self.FRM_ntbArea, text = spacer)
+        self.LBL_nbtAreaSpacer02 = ttk.Label(self.FRM_ntbArea, text = spacer)
+
+        self.LBL_nbtAreaName = ttk.Label(self.FRM_ntbArea, text = lang["windowAddNewName"])
+        self.ETY_nbtAreaName = ttk.Entry(self.FRM_ntbArea, width = 23)
+
+        # --- Register #03 - Sarea --- name, area
+
+        self.LBL_nbtSareaSpacer01 = ttk.Label(self.FRM_ntbSarea, text = spacer)
+        self.LBL_nbtSareaSpacer02 = ttk.Label(self.FRM_ntbSarea, text = spacer)
+
+        self.LBL_nbtSareaName = ttk.Label(self.FRM_ntbSarea, text = lang["windowAddNewName"])
+        self.ETY_nbtSareaName = ttk.Entry(self.FRM_ntbSarea, width = 23)
+
+        self.LBL_nbtSareaMaster = ttk.Label(self.FRM_ntbSarea, text = lang["windowAddMasterName"])
+        self.CBB_nbtSareaMaster = ttk.Combobox(self.FRM_ntbSarea)
+
+        # --- Register #04 - Port --- name, sarea, available items with value
+
+        # --- Register #05 - Attr --- name
+
+        self.LBL_nbtAttrSpacer01 = ttk.Label(self.FRM_ntbAttr, text = spacer)
+        self.LBL_nbtAttrSpacer02 = ttk.Label(self.FRM_ntbAttr, text = spacer)
+
+        self.LBL_nbtAttrName = ttk.Label(self.FRM_ntbAttr, text = lang["windowAddNewName"])
+        self.ETY_nbtAttrName = ttk.Entry(self.FRM_ntbAttr, width = 23)
+
+        # --- Register #06 - Sattr --- name, attr
+
+        self.LBL_nbtSattrSpacer01 = ttk.Label(self.FRM_ntbSattr, text = spacer)
+        self.LBL_nbtSattrSpacer02 = ttk.Label(self.FRM_ntbSattr, text = spacer)
+
+        self.LBL_nbtSattrName = ttk.Label(self.FRM_ntbSattr, text = lang["windowAddNewName"])
+        self.ETY_nbtSattrName = ttk.Entry(self.FRM_ntbSattr, width = 23)
+
+        self.LBL_nbtSattrMaster = ttk.Label(self.FRM_ntbSattr, text = lang["windowAddMasterName"])
+        self.CBB_nbtSattrMaster = ttk.Combobox(self.FRM_ntbSattr)
+
+        # --- Main Buttons ---
+
+        self.FRM_buttons = ttk.Frame(self.frame)
+
+        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"])
+        self.BTN_cancel = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralCancel"], command = self.windowQuit)
+
+        ######################################
+        # --------- Allign Widgets --------- #
+        ######################################
+
+        # --- Register #01 - Items ---
+
+        self.LBL_nbtItemSpacer01.grid(column = 0, row = 0, columnspan = 2)
+        
+        self.LBL_nbtItemName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.ETY_nbtItemName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtItemAttr.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtItemAttr.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtItemSattr.grid(column = 0, row = 3, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtItemSattr.grid(column = 1, row = 3, sticky = (tk.E), padx = 5, pady = 2)
+
+            #WIP
+
+        # --- Register #02 - Area ---
+
+        self.LBL_nbtAreaSpacer01.grid(column = 0, row = 0, columnspan = 2)
+
+        self.LBL_nbtAreaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.ETY_nbtAreaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtAreaSpacer02.grid(column = 0, row = 2, columnspan = 2)
+
+        # --- Register #03 - Sarea ---
+
+        self.LBL_nbtSareaSpacer01.grid(column = 0, row = 0, columnspan = 2)
+
+        self.LBL_nbtSareaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.ETY_nbtSareaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtSareaMaster.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtSareaMaster.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtSareaSpacer02.grid(column = 0, row = 3, columnspan = 2)
+
+        # --- Register #04 - Port ---
+
+        # --- Register #05 - Attr ---
+
+        self.LBL_nbtAttrSpacer01.grid(column = 0, row = 0, columnspan = 2)
+
+        self.LBL_nbtAttrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.ETY_nbtAttrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtAttrSpacer02.grid(column = 0, row = 2, columnspan = 2)
+
+        # --- Register #06 - Sattr ---
+
+        self.LBL_nbtSattrSpacer01.grid(column = 0, row = 0, columnspan = 2)
+
+        self.LBL_nbtSattrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.ETY_nbtSattrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtSattrMaster.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtSattrMaster.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtSattrSpacer02.grid(column = 0, row = 3, columnspan = 2)
+
+        # --- Register ---
+
+        self.NTB_main.grid(column = 0, row = 0, padx = 3, pady = 3)
+
+        # --- Main Buttons ---
+
+        self.BTN_add.grid(column = 0, row = 0)
+        self.BTN_cancel.grid(column = 1, row = 0)
+
+        self.FRM_buttons.grid(column = 0, row = 1, sticky = (tk.E), padx = 4, pady = 3)
+
+        # --- Main Frame ---
+
+        self.frame.grid(column = 0, row = 0)
+
+        # --- Final Pack
+
+        self.frame.pack()
+
+    def windowQuit(self):
+
+        self.master.destroy()
+
+class scrObjEdit:
+
+    def __init__(self, master):
+
+        self.master = master
+        self.frame = ttk.Frame(self.master)
+
+        self.frame.grid(column = 0, row = 0)
+
+        
+
+        self.frame.pack()
+
+    def windowQuit(self):
+
+        self.master.destroy()
+
+class scrSettings:
+
+    def __init__(self, master):
+
+        self.master = master
+        self.frame = ttk.Frame(self.master)
+
+        self.frame.grid(column = 0, row = 0)
+
+        
+
+        self.frame.pack()
+
+    def windowQuit(self):
+
+        self.master.destroy()
 
 ######################################
 # ---------------------------------- #
