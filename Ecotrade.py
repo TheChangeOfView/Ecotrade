@@ -17,12 +17,17 @@ infoPath = "data/info.ini"
 settingsPath = "data/settings.ini"
 projectData = {"name": None}
 projectChanges = False
+lang = dict()
 
 ######################################
 # ---------------------------------- #
 ######################################
 
 def main(): # Main Function
+
+    global lang
+
+    lang = hand.general().getLang(settingsPath)
 
     root = tk.Tk()
     root.resizable(height = False, width = False)
@@ -49,7 +54,6 @@ class scrMain(): # Main GUI
         #--- Initialize Variables
         
         info = hand.general().getIniCont(infoPath)
-        lang = hand.general().getLang(settingsPath)
         
         activeFstSelect = ""
         activeSndSelect = ""
@@ -120,6 +124,8 @@ class scrMain(): # Main GUI
 
         self.SLB_offer = ttk.Scrollbar(self.FRM_listboxes, orient = tk.VERTICAL, command = self.TRW_offer.yview)
         self.TRW_offer["yscrollcommand"] = self.SLB_offer.set
+
+        self.TRW_offer.bind("<<TreeviewSelect>>", self.TRW_offer_callback)
         
         # --- Sorting Combobox
         
@@ -170,10 +176,6 @@ class scrMain(): # Main GUI
         self.FRM_subattribute = ttk.Frame(self.LBF_Attributes)
         self.LBL_subattribute = ttk.Label(self.FRM_subattribute, text = lang["attributesSubattribute"], width = 35)
         self.TXT_subattributeActive = tk.Text(self.FRM_subattribute, width = 20, height = 3, state = "disabled")
-        
-        defaultItem = {"buy": "-", "sell": "-", "name": "-", "port": "-", "area": "-", "subarea": "-", "attribute": "-", "subattribute": "-"}
-        
-        self.setItemInfo(defaultItem)
         
         # --- Buttons Masterframe
         
@@ -318,12 +320,11 @@ class scrMain(): # Main GUI
         projectData["sattr"] = dict()
 
         self.browserSetFirstSection()
+        self.setItemInfo(None)
 
         self.CBB_Sorting_callback(None)
 
     def CBB_Sorting_callback(self, event):
-
-        lang = hand.general().getLang(settingsPath)
         
         value = self.CBB_sorting.current()
 
@@ -407,6 +408,8 @@ class scrMain(): # Main GUI
         else:
 
             self.browserSetFirstSection()
+
+        self.setItemInfo(None)
 
     def LBX_stSelect_callback(self, event):
 
@@ -707,6 +710,8 @@ class scrMain(): # Main GUI
 
                         self.LBX_ndSelect.insert(tk.END, entry)
 
+            self.setItemInfo(None)
+
     def LBX_ndSelect_callback(self, event):
 
         if self.LBX_ndSelect.curselection() == ():
@@ -986,6 +991,8 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+            self.setItemInfo(None)
+
     def LBX_rdSelect_callback(self, event):
 
         if self.LBX_rdSelect.curselection() == ():
@@ -1093,10 +1100,177 @@ class scrMain(): # Main GUI
 
                 pass
 
+            self.setItemInfo(None)
+
+    def TRW_offer_callback(self, event):
+
+        active = self.TRW_offer.selection()
+
+        entry = list(dict(self.TRW_offer.item(active))["values"])[0]
+
+        if self.CBB_sorting.get() == lang["titlePort"] or self.CBB_sorting.get() == lang["titleArea"] or self.CBB_sorting.get() == lang["titleSubarea"]:
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == entry:
+
+                    itemID = item
+
+            if self.CBB_sorting.get() == lang["titlePort"]:
+
+                allItems = self.LBX_stSelect.get(0, tk.END)
+                selectionIndex = self.LBX_stSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activePort = selectionList[0]
+
+            elif self.CBB_sorting.get() == lang["titleArea"]:
+
+                allItems = self.LBX_rdSelect.get(0, tk.END)
+                selectionIndex = self.LBX_rdSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activePort = selectionList[0]
+
+            elif self.CBB_sorting.get() == lang["titleSubarea"]:
+
+                allItems = self.LBX_ndSelect.get(0, tk.END)
+                selectionIndex = self.LBX_ndSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activePort = selectionList[0]
+
+            else:
+
+                return -1
+
+            for port in projectData["item"][itemID]["port"]:
+
+                if port == activePort:
+
+                    value = projectData["item"][itemID]["port"][port]
+
+                    itemBuy, itemSell = value.split("-")
+
+            for sarea in projectData["sarea"]:
+
+                for port in projectData["sarea"][sarea]["port"]:
+
+                    if port == activePort:
+
+                        itemSarea = projectData["sarea"][sarea]["name"]
+
+            for area in projectData["area"]:
+
+                for sarea in projectData["area"][area]["sarea"]:
+
+                    if sarea == itemSarea:
+
+                        itemArea = projectData["area"][area]["name"]
+
+            item = {
+
+                "name" : entry,
+                "image" : projectData["item"][itemID]["image"],
+                "port" : activePort,
+                "buy" : itemBuy,
+                "sell" : itemSell,
+                "attr" : projectData["item"][itemID]["attr"],
+                "sattr" : projectData["item"][itemID]["sattr"],
+                "sarea" : itemSarea,
+                "area" : itemArea
+
+            }
+
+            self.setItemInfo(item)
+
+        else:
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"] == entry:
+
+                    portID = port
+
+            if self.CBB_sorting.get() == lang["titleItem"]:
+
+                allItems = self.LBX_stSelect.get(0, tk.END)
+                selectionIndex = self.LBX_stSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activeItem = selectionList[0]
+
+            elif self.CBB_sorting.get() == lang["titleAttr"]:
+
+                allItems = self.LBX_rdSelect.get(0, tk.END)
+                selectionIndex = self.LBX_rdSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activeItem = selectionList[0]
+
+            elif self.CBB_sorting.get() == lang["titleSubattr"]:
+
+                allItems = self.LBX_ndSelect.get(0, tk.END)
+                selectionIndex = self.LBX_ndSelect.curselection()
+                selectionList = [allItems[item] for item in selectionIndex]
+                activeItem = selectionList[0]
+
+            else:
+
+                return -1
+
+            for sarea in projectData["sarea"]:
+
+                for port in projectData["sarea"][sarea]["port"]:
+
+                    if port == entry:
+
+                        itemSarea = projectData["sarea"][sarea]["name"]
+
+            for area in projectData["area"]:
+
+                for sarea in projectData["area"][area]["sarea"]:
+
+                    if sarea == itemSarea:
+
+                        itemArea = projectData["area"][area]["name"]
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == activeItem:
+
+                    itemImage = projectData["item"][item]["image"]
+                    itemAttr = projectData["item"][item]["attr"]
+                    itemSattr = projectData["item"][item]["sattr"]
+
+                    value = projectData["item"][item]["port"][entry]
+
+                    itemBuy, itemSell = value.split("-")
+
+            item = {
+
+                "name" : activeItem,
+                "image" : itemImage,
+                "port" : entry,
+                "buy" : itemBuy,
+                "sell" : itemSell,
+                "attr" : itemAttr,
+                "sattr" : itemSattr,
+                "sarea" : itemSarea,
+                "area" : itemArea
+
+            }
+
+            self.setItemInfo(item)
+
     def objectAdd(self):
 
         self.addObjectScreen = tk.Toplevel(self.master)
         self.addObjectScreen.grab_set()
+        self.addObjectScreen.resizable(height = False, width = False)
+
+        windowWidth = 320
+        windowHeight = 486
+        
+        positionRight = int(self.addObjectScreen.winfo_screenwidth()/2 - windowWidth/2)
+        positionDown = int(self.addObjectScreen.winfo_screenheight()/2 - windowHeight/2)
+
+        self.addObjectScreen.geometry("+{}+{}".format(positionRight, positionDown))
 
         self.addObj = scrObjAdd(self.addObjectScreen)
 
@@ -1104,14 +1278,13 @@ class scrMain(): # Main GUI
 
         self.editObjectScreen = tk.Toplevel(self.master)
         self.editObjectScreen.grab_set()
+        self.editObjectScreen.resizable(height = False, width = False)
 
         self.editObj = scrObjEdit(self.editObjectScreen)
 
     def projectNew(self):
 
         global projectData
-
-        lang = hand.general().getLang(settingsPath)
 
         alertMsgLine1, alertMsgLine2 = str(lang["promptNewProjectAlertText"]).split("/")
 
@@ -1147,7 +1320,6 @@ class scrMain(): # Main GUI
 
         global projectData
 
-        lang = hand.general().getLang(settingsPath)
         info = hand.general().getIniCont(infoPath)
 
         filePath = filedialog.askopenfilename(
@@ -1177,12 +1349,11 @@ class scrMain(): # Main GUI
 
         self.settingsScreen = tk.Toplevel(self.master)
         self.settingsScreen.grab_set()
+        self.settingsScreen.resizable(height = False, width = False)
 
         self.settings = scrSettings(self.settingsScreen)
 
     def programQuit(self):
-
-        lang = hand.general().getLang(settingsPath)
 
         if projectChanges == True:
 
@@ -1203,6 +1374,33 @@ class scrMain(): # Main GUI
             self.frame.quit()
 
     def setItemInfo(self, item):
+
+        if item == None:
+
+            item = {
+
+                "name" : "-",
+                "image" : "None",
+                "port" : "-",
+                "buy" : "-",
+                "sell" : "-",
+                "attr" : "-",
+                "sattr" : "-",
+                "sarea" : "-",
+                "area" : "-"
+
+            }
+
+        if item["image"] == "None":
+
+            itemImage = tk.PhotoImage(file = "data/noImage.pgm")
+
+        else:
+
+            itemImage = tk.PhotoImage(file = item["image"])
+
+        self.IMG_item.config(image = itemImage)
+        self.IMG_item.image = itemImage
         
         self.itemBuyActiveTextvariable.set(item["buy"])
         
@@ -1225,22 +1423,20 @@ class scrMain(): # Main GUI
         
         self.TXT_subareaActive.config(state = "normal")
         self.TXT_subareaActive.delete(1.0, "end")
-        self.TXT_subareaActive.insert(1.0, item["subarea"])
+        self.TXT_subareaActive.insert(1.0, item["sarea"])
         self.TXT_subareaActive.config(state = "disabled")
         
         self.TXT_attributeActive.config(state = "normal")
         self.TXT_attributeActive.delete(1.0, "end")
-        self.TXT_attributeActive.insert(1.0, item["attribute"])
+        self.TXT_attributeActive.insert(1.0, item["attr"])
         self.TXT_attributeActive.config(state = "disabled")
         
         self.TXT_subattributeActive.config(state = "normal")
         self.TXT_subattributeActive.delete(1.0, "end")
-        self.TXT_subattributeActive.insert(1.0, item["subattribute"])
+        self.TXT_subattributeActive.insert(1.0, item["sattr"])
         self.TXT_subattributeActive.config(state = "disabled")
         
     def browserSetFirstSection(self):
-
-        lang = hand.general().getLang(settingsPath)
 
         activeSorting = self.CBB_sorting.get()
 
@@ -1353,10 +1549,6 @@ class scrObjAdd:
 
     def __init__(self, master):
 
-        spacer = "                                                                                            "
-
-        lang = hand.general().getLang(settingsPath)
-
         self.master = master
         self.frame = ttk.Frame(self.master)
         
@@ -1369,11 +1561,34 @@ class scrObjAdd:
         self.NTB_main = ttk.Notebook(self.frame)
 
         self.FRM_ntbItem = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbItem.columnconfigure(0, weight = 1)
+        self.FRM_ntbItem.columnconfigure(1, weight = 1)
+
         self.FRM_ntbArea = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbArea.columnconfigure(0, weight = 1)
+        self.FRM_ntbArea.columnconfigure(1, weight = 1)
+
         self.FRM_ntbSarea = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbSarea.columnconfigure(0, weight = 1)
+        self.FRM_ntbSarea.columnconfigure(1, weight = 1)
+
         self.FRM_ntbPort = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbPort.columnconfigure(0, weight = 1)
+        self.FRM_ntbPort.columnconfigure(1, weight = 1)
+        
         self.FRM_ntbAttr = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbAttr.columnconfigure(0, weight = 1)
+        self.FRM_ntbAttr.columnconfigure(1, weight = 1)
+
         self.FRM_ntbSattr = ttk.Frame(self.NTB_main)
+
+        self.FRM_ntbSattr.columnconfigure(0, weight = 1)
+        self.FRM_ntbSattr.columnconfigure(1, weight = 1)
 
         self.NTB_main.add(self.FRM_ntbItem, text = lang["titleItem"])
         self.NTB_main.add(self.FRM_ntbArea, text = lang["titleArea"])
@@ -1382,76 +1597,176 @@ class scrObjAdd:
         self.NTB_main.add(self.FRM_ntbAttr, text = lang["titleAttribute"])
         self.NTB_main.add(self.FRM_ntbSattr, text = lang["titleSubattribute"])
 
+        self.NTB_main.bind("<<NotebookTabChanged>>", self.NTB_main_callback)
+
         # --- Register #01 - Items --- name, available Ports with value, attr, subattr
 
-        self.LBL_nbtItemSpacer01 = ttk.Label(self.FRM_ntbItem, text = spacer)
-
-        self.LBL_nbtItemName = ttk.Label(self.FRM_ntbItem, text = lang["windowAddNewName"])
+        self.LBL_nbtItemName = ttk.Label(self.FRM_ntbItem, text = f"{lang['titleName']}:")
         self.ETY_nbtItemName = ttk.Entry(self.FRM_ntbItem, width = 23)
 
-        self.LBL_nbtItemAttr = ttk.Label(self.FRM_ntbItem, text = lang["titleAttribute"])
-        self.CBB_nbtItemAttr = ttk.Combobox(self.FRM_ntbItem)
+        self.FRM_nbtItemImage = ttk.Frame(self.FRM_ntbItem)
 
-        self.LBL_nbtItemSattr = ttk.Label(self.FRM_ntbItem, text = lang["titleSubattribute"])
-        self.CBB_nbtItemSattr = ttk.Combobox(self.FRM_ntbItem)
+        self.FRM_nbtItemImage.columnconfigure(0, weight = 1)
+        self.FRM_nbtItemImage.columnconfigure(1, weight = 1)
+
+        self.LBL_nbtItemImage = ttk.Label(self.FRM_nbtItemImage, text = f"{lang['titleImageFile']}:")
+
+        self.FRM_nbtItemImageEntry = ttk.Frame(self.FRM_nbtItemImage)
+
+        self.ETY_nbtItemImageEntry = ttk.Entry(self.FRM_nbtItemImageEntry, width = 18)
+        self.BTN_nbtItemImageEntry = ttk.Button(self.FRM_nbtItemImageEntry, text = "...", width = 3, command = self.buttonItemImage)
+
+        self.LBL_nbtItemAttr = ttk.Label(self.FRM_ntbItem, text = f"{lang['titleItem']}-{lang['titleAttribute']}:")
+        self.CBB_nbtItemAttr = ttk.Combobox(self.FRM_ntbItem, state = "readonly")
+
+        self.CBB_nbtItemAttr.bind("<<ComboboxSelected>>", self.CBB_nbtItemAttr_callback)
+
+        self.LBL_nbtItemSattr = ttk.Label(self.FRM_ntbItem, text = f"{lang['titleItem']}-{lang['titleSubattribute']}:")
+        self.CBB_nbtItemSattr = ttk.Combobox(self.FRM_ntbItem, state = "readonly")
+
+        self.FRM_nbtItemPortTree = ttk.Frame(self.FRM_ntbItem)
+
+        TRW_nbtItemPortColumnList = (f"{lang['titlePort']}, {lang['titleBuy']}, {lang['titleSell']}")
+
+        self.TRW_nbtItemPortTree = ttk.Treeview(self.FRM_nbtItemPortTree, columns = TRW_nbtItemPortColumnList, show = "headings", height = 10)
+
+        self.TRW_nbtItemPortTree.heading(0, text = lang["titlePort"])
+        self.TRW_nbtItemPortTree.column(0, width = 175)
+        self.TRW_nbtItemPortTree.heading(1, text = lang["titleBuy"])
+        self.TRW_nbtItemPortTree.column(1, width = 50)
+        self.TRW_nbtItemPortTree.heading(2, text = lang["titleSell"])
+        self.TRW_nbtItemPortTree.column(2, width = 50)
+
+        self.SLB_nbtItemPortTree = ttk.Scrollbar(self.FRM_nbtItemPortTree, orient = tk.VERTICAL, command = self.TRW_nbtItemPortTree.yview)
+        self.TRW_nbtItemPortTree["yscrollcommand"] = self.SLB_nbtItemPortTree.set
+
+        self.TRW_nbtItemPortTree.bind("<<TreeviewSelect>>", self.TRW_nbtItemPortTree_callback)
+
+        self.FRM_nbtItemPortEntry = ttk.Frame(self.FRM_ntbItem)
+
+        self.FRM_nbtItemPortEntry.columnconfigure(0, weight = 1)
+        self.FRM_nbtItemPortEntry.columnconfigure(1, weight = 1)
+
+        self.CBB_nbtItemPortEntry = ttk.Combobox(self.FRM_nbtItemPortEntry, width = 24, state = "readonly")
+
+        self.CBB_nbtItemPortEntry.bind("<<ComboboxSelected>>", self.CBB_nbtItemPortEntry_callback)
+
+        self.FRM_nbtItemPortEntryValue = ttk.Frame(self.FRM_nbtItemPortEntry)
+
+        self.ETY_nbtItemPortEntryValueBuy = ttk.Entry(self.FRM_nbtItemPortEntryValue, width = 9)
+        self.ETY_nbtItemPortEntryValueSell = ttk.Entry(self.FRM_nbtItemPortEntryValue, width = 9)
+
+        self.FRM_nbtItemPortButtons = ttk.Frame(self.FRM_ntbItem)
+
+        self.FRM_nbtItemPortButtons.columnconfigure(0, weight = 1)
+        self.FRM_nbtItemPortButtons.columnconfigure(1, weight = 1)
+
+        self.BTN_nbtItemPortButtonsAdd = ttk.Button(self.FRM_nbtItemPortButtons, text = lang["buttonGeneralAdd"], width = 20, command = self.buttonItemAddPort)
+        self.BTN_nbtItemPortButtonsRemove = ttk.Button(self.FRM_nbtItemPortButtons, text = lang["buttonGeneralRemove"], width = 20, command = self.buttonItemRemovePort)
 
         # --- Register #02 - Area --- name
 
-        self.LBL_nbtAreaSpacer01 = ttk.Label(self.FRM_ntbArea, text = spacer)
-        self.LBL_nbtAreaSpacer02 = ttk.Label(self.FRM_ntbArea, text = spacer)
-
-        self.LBL_nbtAreaName = ttk.Label(self.FRM_ntbArea, text = lang["windowAddNewName"])
+        self.LBL_nbtAreaName = ttk.Label(self.FRM_ntbArea, text = f"{lang['titleName']}:")
         self.ETY_nbtAreaName = ttk.Entry(self.FRM_ntbArea, width = 23)
 
         # --- Register #03 - Sarea --- name, area
 
-        self.LBL_nbtSareaSpacer01 = ttk.Label(self.FRM_ntbSarea, text = spacer)
-        self.LBL_nbtSareaSpacer02 = ttk.Label(self.FRM_ntbSarea, text = spacer)
-
-        self.LBL_nbtSareaName = ttk.Label(self.FRM_ntbSarea, text = lang["windowAddNewName"])
+        self.LBL_nbtSareaName = ttk.Label(self.FRM_ntbSarea, text = f"{lang['titleName']}:")
         self.ETY_nbtSareaName = ttk.Entry(self.FRM_ntbSarea, width = 23)
 
-        self.LBL_nbtSareaMaster = ttk.Label(self.FRM_ntbSarea, text = lang["windowAddMasterName"])
-        self.CBB_nbtSareaMaster = ttk.Combobox(self.FRM_ntbSarea)
+        self.LBL_nbtSareaMaster = ttk.Label(self.FRM_ntbSarea, text = f"{lang['titleArea']}:")
+        self.CBB_nbtSareaMaster = ttk.Combobox(self.FRM_ntbSarea, state = "readonly")
 
         # --- Register #04 - Port --- name, sarea, available items with value
 
+        self.LBL_nbtPortName = ttk.Label(self.FRM_ntbPort, text = f"{lang['titleName']}:")
+        self.ETY_nbtPortName = ttk.Entry(self.FRM_ntbPort, width = 23)
+
+        self.LBL_nbtPortArea = ttk.Label(self.FRM_ntbPort, text = f"{lang['titlePort']}-{lang['titleArea']}:")
+        self.CBB_nbtPortArea = ttk.Combobox(self.FRM_ntbPort, state = "readonly")
+
+        self.CBB_nbtPortArea.bind("<<ComboboxSelected>>", self.CBB_nbtPortArea_callback)
+
+        self.LBL_nbtPortSarea = ttk.Label(self.FRM_ntbPort, text = f"{lang['titlePort']}-{lang['titleSubarea']}:")
+        self.CBB_nbtPortSarea = ttk.Combobox(self.FRM_ntbPort, state = "readonly")
+
+        self.FRM_nbtPortItemTree = ttk.Frame(self.FRM_ntbPort)
+
+        TRW_nbtPortItemColumnList = (f"{lang['titleItem']}, {lang['titleBuy']}, {lang['titleSell']}")
+
+        self.TRW_nbtPortItemTree = ttk.Treeview(self.FRM_nbtPortItemTree, columns = TRW_nbtPortItemColumnList, show = "headings", height = 10)
+
+        self.TRW_nbtPortItemTree.heading(0, text = lang["titleItem"])
+        self.TRW_nbtPortItemTree.column(0, width = 175)
+        self.TRW_nbtPortItemTree.heading(1, text = lang["titleBuy"])
+        self.TRW_nbtPortItemTree.column(1, width = 50)
+        self.TRW_nbtPortItemTree.heading(2, text = lang["titleSell"])
+        self.TRW_nbtPortItemTree.column(2, width = 50)
+
+        self.SLB_nbtPortItemTree = ttk.Scrollbar(self.FRM_nbtPortItemTree, orient = tk.VERTICAL, command = self.TRW_nbtPortItemTree.yview)
+        self.TRW_nbtPortItemTree["yscrollcommand"] = self.SLB_nbtPortItemTree.set
+
+        self.TRW_nbtPortItemTree.bind("<<TreeviewSelect>>", self.TRW_nbtPortItemTree_callback)
+
+        self.FRM_nbtPortItemEntry = ttk.Frame(self.FRM_ntbPort)
+
+        self.FRM_nbtPortItemEntry.columnconfigure(0, weight = 1)
+        self.FRM_nbtPortItemEntry.columnconfigure(1, weight = 1)
+
+        self.CBB_nbtPortItemEntry = ttk.Combobox(self.FRM_nbtPortItemEntry, width = 24, state = "readonly")
+
+        self.CBB_nbtPortItemEntry.bind("<<ComboboxSelected>>", self.CBB_nbtPortItemEntry_callback)
+
+        self.FRM_nbtPortItemEntryValue = ttk.Frame(self.FRM_nbtPortItemEntry)
+
+        self.ETY_nbtPortItemEntryValueBuy = ttk.Entry(self.FRM_nbtPortItemEntryValue, width = 9)
+        self.ETY_nbtPortItemEntryValueSell = ttk.Entry(self.FRM_nbtPortItemEntryValue, width = 9)
+
+        self.FRM_nbtPortItemButtons = ttk.Frame(self.FRM_ntbPort)
+
+        self.FRM_nbtPortItemButtons.columnconfigure(0, weight = 1)
+        self.FRM_nbtPortItemButtons.columnconfigure(1, weight = 1)
+
+        self.BTN_nbtPortItemButtonsAdd = ttk.Button(self.FRM_nbtPortItemButtons, text = lang["buttonGeneralAdd"], width = 20, command = self.buttonPortAddItem)
+        self.BTN_nbtPortItemButtonsRemove = ttk.Button(self.FRM_nbtPortItemButtons, text = lang["buttonGeneralRemove"], width = 20, command = self.buttonPortRemoveItem)
+
         # --- Register #05 - Attr --- name
 
-        self.LBL_nbtAttrSpacer01 = ttk.Label(self.FRM_ntbAttr, text = spacer)
-        self.LBL_nbtAttrSpacer02 = ttk.Label(self.FRM_ntbAttr, text = spacer)
-
-        self.LBL_nbtAttrName = ttk.Label(self.FRM_ntbAttr, text = lang["windowAddNewName"])
+        self.LBL_nbtAttrName = ttk.Label(self.FRM_ntbAttr, text = f"{lang['titleName']}:")
         self.ETY_nbtAttrName = ttk.Entry(self.FRM_ntbAttr, width = 23)
 
         # --- Register #06 - Sattr --- name, attr
 
-        self.LBL_nbtSattrSpacer01 = ttk.Label(self.FRM_ntbSattr, text = spacer)
-        self.LBL_nbtSattrSpacer02 = ttk.Label(self.FRM_ntbSattr, text = spacer)
-
-        self.LBL_nbtSattrName = ttk.Label(self.FRM_ntbSattr, text = lang["windowAddNewName"])
+        self.LBL_nbtSattrName = ttk.Label(self.FRM_ntbSattr, text = f"{lang['titleName']}:")
         self.ETY_nbtSattrName = ttk.Entry(self.FRM_ntbSattr, width = 23)
 
-        self.LBL_nbtSattrMaster = ttk.Label(self.FRM_ntbSattr, text = lang["windowAddMasterName"])
-        self.CBB_nbtSattrMaster = ttk.Combobox(self.FRM_ntbSattr)
+        self.LBL_nbtSattrMaster = ttk.Label(self.FRM_ntbSattr, text = f"{lang['titleAttribute']}:")
+        self.CBB_nbtSattrMaster = ttk.Combobox(self.FRM_ntbSattr, state = "readonly")
 
         # --- Main Buttons ---
 
         self.FRM_buttons = ttk.Frame(self.frame)
 
-        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"])
-        self.BTN_cancel = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralCancel"], command = self.windowQuit)
+        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"], command = self.buttonMainAdd)
+        self.BTN_cancel = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralCancel"], command = self.buttonMainCancel)
 
         ######################################
         # --------- Allign Widgets --------- #
         ######################################
 
         # --- Register #01 - Items ---
-
-        self.LBL_nbtItemSpacer01.grid(column = 0, row = 0, columnspan = 2)
         
-        self.LBL_nbtItemName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
-        self.ETY_nbtItemName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+        self.LBL_nbtItemName.grid(column = 0, row = 0, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtItemName.grid(column = 1, row = 0, sticky = (tk.E), padx = 5, pady = 5)
+
+        self.FRM_nbtItemImage.grid(column = 0, row = 1, columnspan = 2, sticky = (tk.W, tk.E), padx = 5, pady = 1)
+
+        self.LBL_nbtItemImage.grid(column = 0, row = 0, sticky = (tk.W))
+
+        self.FRM_nbtItemImageEntry.grid(column = 1, row = 0, sticky = (tk.E))
+
+        self.ETY_nbtItemImageEntry.grid(column = 1, row = 0, padx = 2)
+        self.BTN_nbtItemImageEntry.grid(column = 2, row = 0)
 
         self.LBL_nbtItemAttr.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
         self.CBB_nbtItemAttr.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
@@ -1459,51 +1774,80 @@ class scrObjAdd:
         self.LBL_nbtItemSattr.grid(column = 0, row = 3, sticky = (tk.W), padx = 5, pady = 2)
         self.CBB_nbtItemSattr.grid(column = 1, row = 3, sticky = (tk.E), padx = 5, pady = 2)
 
-            #WIP
+        self.FRM_nbtItemPortTree.grid(column = 0, row = 4, columnspan = 2, sticky = (tk.W, tk.E), padx = 5, pady = 2)
+
+        self.TRW_nbtItemPortTree.grid(column = 0, row = 0)
+        self.SLB_nbtItemPortTree.grid(column = 1, row = 0, sticky = (tk.N, tk.S))
+
+        self.FRM_nbtItemPortEntry.grid(column = 0, row = 5, columnspan = 2, sticky = (tk.W, tk.E), padx = 5)
+
+        self.CBB_nbtItemPortEntry.grid(column = 0, row = 0, sticky = (tk.W))
+
+        self.FRM_nbtItemPortEntryValue.grid(column = 1, row = 0, sticky = (tk.E))
+
+        self.ETY_nbtItemPortEntryValueBuy.grid(column = 0, row = 0, padx = 2)
+        self.ETY_nbtItemPortEntryValueSell.grid(column = 1, row = 0, padx = 1)
+
+        self.FRM_nbtItemPortButtons.grid(column = 0, row = 6, columnspan = 2, padx = 5, pady = 2)
+
+        self.BTN_nbtItemPortButtonsAdd.grid(column = 0, row = 0)
+        self.BTN_nbtItemPortButtonsRemove.grid(column = 1, row = 0)
 
         # --- Register #02 - Area ---
 
-        self.LBL_nbtAreaSpacer01.grid(column = 0, row = 0, columnspan = 2)
-
-        self.LBL_nbtAreaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
-        self.ETY_nbtAreaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
-
-        self.LBL_nbtAreaSpacer02.grid(column = 0, row = 2, columnspan = 2)
+        self.LBL_nbtAreaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtAreaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 5)
 
         # --- Register #03 - Sarea ---
 
-        self.LBL_nbtSareaSpacer01.grid(column = 0, row = 0, columnspan = 2)
-
-        self.LBL_nbtSareaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
-        self.ETY_nbtSareaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+        self.LBL_nbtSareaName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtSareaName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 5)
 
         self.LBL_nbtSareaMaster.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
         self.CBB_nbtSareaMaster.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
 
-        self.LBL_nbtSareaSpacer02.grid(column = 0, row = 3, columnspan = 2)
-
         # --- Register #04 - Port ---
+
+        self.LBL_nbtPortName.grid(column = 0, row = 0, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtPortName.grid(column = 1, row = 0, sticky = (tk.E), padx = 5, pady = 5)
+
+        self.LBL_nbtPortArea.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtPortArea.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.LBL_nbtPortSarea.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
+        self.CBB_nbtPortSarea.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
+
+        self.FRM_nbtPortItemTree.grid(column = 0, row = 3, columnspan = 2, sticky = (tk.W, tk.E), padx = 5, pady = 2)
+
+        self.TRW_nbtPortItemTree.grid(column = 0, row = 0)
+        self.SLB_nbtPortItemTree.grid(column = 1, row = 0, sticky = (tk.N, tk.S))
+
+        self.FRM_nbtPortItemEntry.grid(column = 0, row = 4, columnspan = 2, sticky = (tk.W, tk.E), padx = 5)
+
+        self.CBB_nbtPortItemEntry.grid(column = 0, row = 0, sticky = (tk.W))
+
+        self.FRM_nbtPortItemEntryValue.grid(column = 1, row = 0, sticky = (tk.E))
+
+        self.ETY_nbtPortItemEntryValueBuy.grid(column = 0, row = 0, padx = 2)
+        self.ETY_nbtPortItemEntryValueSell.grid(column = 1, row = 0, padx = 1)
+
+        self.FRM_nbtPortItemButtons.grid(column = 0, row = 5, columnspan = 2, padx = 5, pady = 2)
+
+        self.BTN_nbtPortItemButtonsAdd.grid(column = 0, row = 0)
+        self.BTN_nbtPortItemButtonsRemove.grid(column = 1, row = 0)
 
         # --- Register #05 - Attr ---
 
-        self.LBL_nbtAttrSpacer01.grid(column = 0, row = 0, columnspan = 2)
-
-        self.LBL_nbtAttrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
-        self.ETY_nbtAttrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
-
-        self.LBL_nbtAttrSpacer02.grid(column = 0, row = 2, columnspan = 2)
+        self.LBL_nbtAttrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtAttrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 5)
 
         # --- Register #06 - Sattr ---
 
-        self.LBL_nbtSattrSpacer01.grid(column = 0, row = 0, columnspan = 2)
-
-        self.LBL_nbtSattrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 2)
-        self.ETY_nbtSattrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 2)
+        self.LBL_nbtSattrName.grid(column = 0, row = 1, sticky = (tk.W), padx = 5, pady = 5)
+        self.ETY_nbtSattrName.grid(column = 1, row = 1, sticky = (tk.E), padx = 5, pady = 5)
 
         self.LBL_nbtSattrMaster.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
         self.CBB_nbtSattrMaster.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
-
-        self.LBL_nbtSattrSpacer02.grid(column = 0, row = 3, columnspan = 2)
 
         # --- Register ---
 
@@ -1524,7 +1868,280 @@ class scrObjAdd:
 
         self.frame.pack()
 
-    def windowQuit(self):
+        self.getInitialValues()
+
+    def getInitialValues(self):
+
+        empty = list()
+        empty.append("")
+
+        # -- item --
+
+        entryList = list()
+
+        entryList.append(f"-- {lang['titleItem'].lower()} --")
+
+        for item in projectData["item"]:
+
+            entryList.append(projectData["item"][item]["name"])
+
+        self.CBB_nbtPortItemEntry.config(values = entryList)
+        self.CBB_nbtPortItemEntry.current(0)
+
+        # -- port --
+
+        entryList = list()
+
+        entryList.append(f"-- {lang['titlePort'].lower()} --")
+
+        for port in projectData["port"]:
+
+            entryList.append(projectData["port"][port]["name"])
+
+        self.CBB_nbtItemPortEntry.config(values = entryList)
+        self.CBB_nbtItemPortEntry.current(0)
+
+        # -- attr --
+
+        entryList = list()
+
+        entryList.append(f"-- {lang['titleAttribute'].lower()} --")
+
+        for attr in projectData["attr"]:
+
+            entryList.append(projectData["attr"][attr]["name"])
+
+        self.CBB_nbtItemAttr.config(values = entryList)
+        self.CBB_nbtItemAttr.current(0)
+
+        self.CBB_nbtSattrMaster.config(values = entryList)
+        self.CBB_nbtSattrMaster.current(0)
+
+        self.CBB_nbtItemSattr.config(values = empty)
+        self.CBB_nbtItemSattr.current(0)
+        self.CBB_nbtItemSattr.config(state = "disabled")
+
+        # -- area --
+
+        entryList = list()
+
+        entryList.append(f"-- {lang['titleArea'].lower()} --")
+
+        for area in projectData["area"]:
+
+            entryList.append(projectData["area"][area]["name"])
+
+        self.CBB_nbtPortArea.config(values = entryList)
+        self.CBB_nbtPortArea.current(0)
+
+        self.CBB_nbtSareaMaster.config(values = entryList)
+        self.CBB_nbtSareaMaster.current(0)
+
+        self.CBB_nbtPortSarea.config(values = empty)
+        self.CBB_nbtPortSarea.current(0)
+        self.CBB_nbtPortSarea.config(state = "disabled")
+
+
+        # -- other --
+
+        self.ETY_nbtItemName.delete(0, tk.END)
+        self.ETY_nbtItemImageEntry.delete(0, tk.END)
+        self.TRW_nbtItemPortTree.delete(*self.TRW_nbtItemPortTree.get_children())
+
+        self.ETY_nbtAttrName.delete(0, tk.END)
+
+        self.ETY_nbtSattrName.delete(0, tk.END)
+
+        self.ETY_nbtPortName.delete(0, tk.END)
+        self.TRW_nbtPortItemTree.delete(*self.TRW_nbtPortItemTree.get_children())
+
+        self.ETY_nbtAreaName.delete(0, tk.END)
+
+        self.ETY_nbtSareaName.delete(0, tk.END)
+
+        self.ETY_nbtItemPortEntryValueBuy.delete(0, tk.END)
+        self.ETY_nbtItemPortEntryValueSell.delete(0, tk.END)
+
+        self.ETY_nbtPortItemEntryValueBuy.delete(0, tk.END)
+        self.ETY_nbtPortItemEntryValueBuy.delete(0, tk.END)
+
+        self.BTN_nbtItemPortButtonsAdd.config(state = "disabled")
+        self.BTN_nbtItemPortButtonsRemove.config(state = "disabled")
+        self.BTN_nbtPortItemButtonsAdd.config(state = "disabled")
+        self.BTN_nbtPortItemButtonsRemove.config(state = "disabled")
+
+    def NTB_main_callback(self, event):
+
+        self.getInitialValues()
+
+    def CBB_nbtItemAttr_callback(self, event):
+
+        active = self.CBB_nbtItemAttr.get()
+
+        if active == f"-- {lang['titleAttribute'].lower()} --":
+
+            empty = list()
+            empty.append("")
+
+            self.CBB_nbtItemSattr.config(values = empty)
+            self.CBB_nbtItemSattr.current(0)
+            self.CBB_nbtItemSattr.config(state = "disabled")
+
+        else:
+
+            for attr in projectData["attr"]:
+
+                if projectData["attr"][attr]["name"] == active:
+
+                    attrID = attr
+
+            sattrList = list()
+
+            for sattr in projectData["attr"][attrID]["sattr"]:
+
+                sattrList.append(sattr)
+
+            sattrList.insert(0, f"-- {lang['titleSubattribute'].lower()} --")
+
+            self.CBB_nbtItemSattr.config(values = sattrList, state = "readonly")
+            self.CBB_nbtItemSattr.current(0)
+
+    def CBB_nbtItemPortEntry_callback(self, event):
+
+        active = self.CBB_nbtItemPortEntry.get()
+
+        if active == f"-- {lang['titlePort'].lower()} --":
+
+            self.BTN_nbtItemPortButtonsAdd.config(state = "disabled")
+
+        else:
+
+            self.BTN_nbtItemPortButtonsAdd.config(state = "normal")
+
+    def CBB_nbtPortArea_callback(self, event):
+
+        active = self.CBB_nbtPortArea.get()
+
+        if active == f"-- {lang['titleArea'].lower()} --":
+
+            empty = list()
+            empty.append("")
+
+            self.CBB_nbtPortSarea.config(values = empty)
+            self.CBB_nbtPortSarea.current(0)
+            self.CBB_nbtPortSarea.config(state = "disabled")
+
+        else:    
+
+            for area in projectData["area"]:
+
+                if projectData["area"][area]["name"] == active:
+
+                    areaID = area
+
+            sareaList = list()
+
+            for sarea in projectData["area"][areaID]["sarea"]:
+
+                sareaList.append(sarea)
+
+            sareaList.insert(0, f"-- {lang['titleSubarea'].lower()} --")
+
+            self.CBB_nbtPortSarea.config(values = sareaList, state = "readonly")
+            self.CBB_nbtPortSarea.current(0)
+
+    def CBB_nbtPortItemEntry_callback(self, event):
+
+        active = self.CBB_nbtPortItemEntry.get()
+
+        if active == f"-- {lang['titleItem'].lower()} --":
+
+            self.BTN_nbtPortItemButtonsAdd.config(state = "disabled")
+
+        else:
+
+            self.BTN_nbtPortItemButtonsAdd.config(state = "normal")
+
+    def TRW_nbtItemPortTree_callback(self, event):
+
+        self.BTN_nbtItemPortButtonsRemove.config(state = "normal")
+
+    def TRW_nbtPortItemTree_callback(self, event):
+
+        self.BTN_nbtPortItemButtonsRemove.config(state = "normal")
+
+    def buttonItemImage(self):
+
+        filePath = filedialog.askopenfilename(
+            
+            initialdir = (sys.path[0]),
+            title = lang["promptLoadImage"],
+            filetypes = (
+
+                ("Graphics Interchange Format", "*.gif"),
+                ("Portable Graymap", "*.pgm"),
+                ("all files","*.*")
+
+                )
+
+            )
+
+        self.ETY_nbtItemImageEntry.delete(0, tk.END)
+        self.ETY_nbtItemImageEntry.insert(0, filePath)
+
+    def buttonItemAddPort(self):
+
+        if self.CBB_nbtItemPortEntry != f"-- {lang['titlePort'].lower()} --":
+
+            name = self.CBB_nbtItemPortEntry.get()
+            buy = self.ETY_nbtItemPortEntryValueBuy.get()
+            sell = self.ETY_nbtItemPortEntryValueSell.get()
+
+            insertList = (name, buy, sell)
+
+            self.TRW_nbtItemPortTree.insert("", "end", values = insertList)
+
+            self.CBB_nbtItemPortEntry.current(0)
+            self.ETY_nbtItemPortEntryValueBuy.delete(0, tk.END)
+            self.ETY_nbtItemPortEntryValueSell.delete(0, tk.END)
+
+    def buttonItemRemovePort(self):
+
+        selection = self.TRW_nbtItemPortTree.selection()
+
+        self.TRW_nbtItemPortTree.delete(selection)
+
+        self.BTN_nbtItemPortButtonsRemove.config(state = "disabled")
+
+    def buttonPortAddItem(self):
+
+        if self.CBB_nbtPortItemEntry != f"-- {lang['titleItem'].lower()} --":
+
+            name = self.CBB_nbtPortItemEntry.get()
+            buy = self.ETY_nbtPortItemEntryValueBuy.get()
+            sell = self.ETY_nbtPortItemEntryValueSell.get()
+
+            insertList = (name, buy, sell)
+
+            self.TRW_nbtPortItemTree.insert("", "end", values = insertList)
+
+            self.CBB_nbtPortItemEntry.current(0)
+            self.ETY_nbtPortItemEntryValueBuy.delete(0, tk.END)
+            self.ETY_nbtPortItemEntryValueSell.delete(0, tk.END)
+
+    def buttonPortRemoveItem(self):
+
+        selection = self.TRW_nbtPortItemTree.selection()
+
+        self.TRW_nbtPortItemTree.delete(selection)
+
+        self.BTN_nbtPortItemButtonsRemove.config(state = "disabled")
+
+    def buttonMainAdd(self):
+
+        print("buttonMainAdd")
+
+    def buttonMainCancel(self):
 
         self.master.destroy()
 
@@ -1570,9 +2187,18 @@ if __name__ == '__main__':
     main()
     
     
+"""
+
+get item of a treeview
+
+active = self.TRW_nbtItemPortTree.selection()
+
+item = dict(self.TRW_nbtItemPortTree.item(active))["values"]
+
+print(item)    
     
     
-    
+"""
     
     
     

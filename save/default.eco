@@ -3,6 +3,7 @@
     "item": {
         "item000000": {
             "name": "9mm-Light",
+            "image": "None",
             "port": {
                 "Tethys": "50-5",
                 "Phoebe": "52-7",
@@ -15,6 +16,7 @@
         },
         "item000001": {
             "name": "50mm-Light",
+            "image": "None",
             "port": {
                 "Hyperion": "100-10",
                 "Phoebe": "102-12",
@@ -26,6 +28,7 @@
         },
         "item000002": {
             "name": "Pistol",
+            "image": "None",
             "port": {
                 "Cronus": "200-50",
                 "Phoebe": "202-52"
@@ -35,6 +38,7 @@
         },
         "item000003": {
             "name": "Switcher",
+            "image": "None",
             "port": {
                 "Coeus": "2000-1000",
                 "Astraeus": "2500-1000"
@@ -44,6 +48,7 @@
         },
         "item000004": {
             "name": "Charger",
+            "image": "None",
             "port": {
                 "Coeus": "4000-1500",
                 "Astraeus": "4000-2000"
