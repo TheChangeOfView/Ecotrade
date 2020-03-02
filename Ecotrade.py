@@ -18,6 +18,7 @@ settingsPath = "data/settings.ini"
 projectData = {"name": None}
 projectChanges = False
 lang = dict()
+eDestroy = 0
 
 ######################################
 # ---------------------------------- #
@@ -185,8 +186,8 @@ class scrMain(): # Main GUI
         # --- Buttons
         
         self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonObjectAdd"], width = 34, command = self.objectAdd)
-        self.BTN_edit = ttk.Button(self.FRM_buttons, text = lang["buttonObjectEdit"], width = 16, command = self.objectEdit)
-        self.BTN_remove = ttk.Button(self.FRM_buttons, text = lang["buttonObjectRemove"], width = 16, command = None)
+        self.BTN_edit = ttk.Button(self.FRM_buttons, text = lang["buttonObjectEdit"], width = 16, command = self.objectEdit, state = "disabled")
+        self.BTN_remove = ttk.Button(self.FRM_buttons, text = lang["buttonObjectRemove"], width = 16, command = self.objectRemove, state = "disabled")
         self.BTN_new = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectNew"], width = 34, command = self.projectNew)
         self.BTN_save = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectSave"], width = 16, command = None)
         self.BTN_load = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectLoad"], width = 16, command = self.projectLoad)
@@ -310,7 +311,7 @@ class scrMain(): # Main GUI
 
         projectData.clear()
 
-        projectData["name"] = "active"
+        projectData["name"] = "active(None)"
 
         projectData["item"] = dict()
         projectData["area"] = dict()
@@ -410,6 +411,8 @@ class scrMain(): # Main GUI
             self.browserSetFirstSection()
 
         self.setItemInfo(None)
+        self.BTN_edit.config(state = "disabled")
+        self.BTN_remove.config(state = "disabled")
 
     def LBX_stSelect_callback(self, event):
 
@@ -458,6 +461,29 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                item = {
+
+                    "name" : projectData["item"][itemID]["name"],
+                    "image" : projectData["item"][itemID]["image"],
+                    "port" : "-",
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : projectData["item"][itemID]["attr"],
+                    "sattr" : projectData["item"][itemID]["sattr"],
+                    "sarea" : "-",
+                    "area" : "-"
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
+
             elif self.CBB_sorting.current() == 1: # - Area
 
                 self.LBX_ndSelect.delete(0, tk.END)
@@ -469,7 +495,7 @@ class scrMain(): # Main GUI
                 selectionList = [allAreas[area] for area in selectionIndex]
                 selection = selectionList[0]
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
                     sortList = list()
 
@@ -481,11 +507,20 @@ class scrMain(): # Main GUI
 
                     if len(projectData["sarea"]) > 1:
 
-                        self.LBX_ndSelect.insert(tk.END, "(All)")
+                        self.LBX_ndSelect.insert(tk.END, lang["generalAll"])
 
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    self.setItemInfo(None)
+
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
 
                 else:
 
@@ -501,15 +536,38 @@ class scrMain(): # Main GUI
 
                         sortList.append(entry)
 
-                    if len(projectData["sarea"]) > 1:
+                    if len(sortList) > 1:
 
-                        self.LBX_ndSelect.insert(tk.END, "(All)")
+                        self.LBX_ndSelect.insert(tk.END, lang["generalAll"])
 
                     sortList.sort()
 
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : "-",
+                        "sattr" : "-",
+                        "sarea" : "-",
+                        "area" : projectData["area"][areaID]["name"]
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
             elif self.CBB_sorting.current() == 2: # - Subarea
 
@@ -526,7 +584,7 @@ class scrMain(): # Main GUI
                 selectionList = [allSarea[sarea] for sarea in selectionIndex]
                 selection = selectionList[0]
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
                     sortList = list()
 
@@ -539,6 +597,15 @@ class scrMain(): # Main GUI
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    self.setItemInfo(None)
+
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
                 
                 else:
 
@@ -559,6 +626,37 @@ class scrMain(): # Main GUI
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    for area in projectData["area"]:
+
+                        for sarea in projectData["area"][area]["sarea"]:
+
+                            if sarea == projectData["sarea"][sareaID]["name"]:
+
+                                sareaMaster = projectData["area"][area]["name"]
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : "-",
+                        "sattr" : "-",
+                        "sarea" : projectData["sarea"][sareaID]["name"],
+                        "area" : sareaMaster
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
             elif self.CBB_sorting.current() == 3: # - Port
 
@@ -608,6 +706,45 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                for sarea in projectData["sarea"]:
+
+                    for entry in projectData["sarea"][sarea]["port"]:
+
+                        if entry == selection:
+
+                            portSarea = projectData["sarea"][sarea]["name"]
+
+                for area in projectData["area"]:
+
+                    for entry in projectData["area"][area]["sarea"]:
+
+                        if entry == portSarea:
+
+                            portArea = projectData["area"][area]["name"]
+
+                item = {
+
+                    "name" : "-",
+                    "image" : "None",
+                    "port" : selection,
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : "-",
+                    "sattr" : "-",
+                    "sarea" : portSarea,
+                    "area" : portArea
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
+
             elif self.CBB_sorting.current() == 4: # - Attribute
 
                 self.LBX_ndSelect.delete(0, tk.END)
@@ -619,7 +756,7 @@ class scrMain(): # Main GUI
                 selectionList = [allAttrs[attr] for attr in selectionIndex]
                 selection = selectionList[0]
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
                     sortList = list()
 
@@ -631,11 +768,20 @@ class scrMain(): # Main GUI
 
                     if len(projectData["sattr"]) > 1:
 
-                        self.LBX_ndSelect.insert(tk.END, "(All)")
+                        self.LBX_ndSelect.insert(tk.END, lang["generalAll"])
                     
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    self.setItemInfo(None)
+
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
 
                 else:
 
@@ -653,13 +799,36 @@ class scrMain(): # Main GUI
 
                     sortList.sort()
 
-                    if len(projectData["sattr"]) > 1:
+                    if len(sortList) > 1:
 
-                        self.LBX_ndSelect.insert(tk.END, "(All)")
+                        self.LBX_ndSelect.insert(tk.END, lang["generalAll"])
 
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : projectData["attr"][attrID]["name"],
+                        "sattr" : "-",
+                        "sarea" : "-",
+                        "area" : "-"
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
             elif self.CBB_sorting.current() == 5: # - Subttribute
 
@@ -676,7 +845,7 @@ class scrMain(): # Main GUI
 
                 # check items for subattribute availability - return list of items contained in active subattribute
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
                     sortList = list()
 
@@ -689,6 +858,15 @@ class scrMain(): # Main GUI
                     for entry in sortList:
 
                         self.LBX_ndSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    self.setItemInfo(None)
+
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
 
                 else:
 
@@ -710,7 +888,42 @@ class scrMain(): # Main GUI
 
                         self.LBX_ndSelect.insert(tk.END, entry)
 
-            self.setItemInfo(None)
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    for entry in projectData["sattr"]:
+
+                            if projectData["sattr"][entry]["name"] == selection:
+
+                                sattrID = entry
+
+                    for attr in projectData["attr"]:
+
+                        for sattr in projectData["attr"][attr]["sattr"]:
+
+                            if sattr == projectData["sattr"][sattrID]["name"]:
+
+                                sattrMaster = projectData["attr"][attr]["name"]
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : sattrMaster,
+                        "sattr" : projectData["sattr"][sattrID]["name"],
+                        "sarea" : "-",
+                        "area" : "-"
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
     def LBX_ndSelect_callback(self, event):
 
@@ -743,9 +956,9 @@ class scrMain(): # Main GUI
                 selectionList = [allSarea[sarea] for sarea in selectionIndex]
                 selection = selectionList[0]
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
-                    if selectionFirst == "(All)":
+                    if selectionFirst == lang["generalAll"]:
 
                         sortList = list()
 
@@ -758,6 +971,12 @@ class scrMain(): # Main GUI
                         for entry in sortList:
 
                             self.LBX_rdSelect.insert(tk.END, entry)
+
+                        ###############################
+                        #---------setItemInfo---------#
+                        ###############################
+
+                        self.setItemInfo(None)
 
                     else:
 
@@ -794,7 +1013,30 @@ class scrMain(): # Main GUI
                         for entry in portList:
 
                             self.LBX_rdSelect.insert(tk.END, entry)
+
+                        ###############################
+                        #---------setItemInfo---------#
+                        ###############################
+
+                        item = {
+
+                            "name" : "-",
+                            "image" : "None",
+                            "port" : "-",
+                            "buy" : "-",
+                            "sell" : "-",
+                            "attr" : "-",
+                            "sattr" : "-",
+                            "sarea" : "-",
+                            "area" : selectionFirst
+
+                        }
+
+                        self.setItemInfo(item)
                 
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
+
                 else:
 
                     for entry in projectData["sarea"]:
@@ -814,6 +1056,43 @@ class scrMain(): # Main GUI
                     for entry in sortList:
 
                         self.LBX_rdSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    if selectionFirst == lang["generalAll"]:
+
+                        for area in projectData["area"]:
+
+                            for entry in projectData["area"][area]["sarea"]:
+
+                                if entry == selection:
+
+                                    sareaMaster = projectData["area"][area]["name"]
+
+                    else:
+
+                        sareaMaster = selectionFirst
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : "-",
+                        "sattr" : "-",
+                        "sarea" : selection,
+                        "area" : sareaMaster
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
             elif self.CBB_sorting.current() == 2: # - Subarea - Port
 
@@ -862,6 +1141,56 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                allSarea = self.LBX_stSelect.get(0, tk.END)
+                selectionIndex = self.LBX_stSelect.curselection()
+                selectionList = [allSarea[sarea] for sarea in selectionIndex]
+                activeSarea = selectionList[0]
+
+                if activeSarea == lang["generalAll"]:
+
+                    for sarea in projectData["sarea"]:
+
+                        for entry in projectData["sarea"][sarea]["port"]:
+
+                            if entry == selection:
+
+                                portSarea = projectData["sarea"][sarea]["name"]
+
+                else:
+
+                    portSarea = activeSarea
+
+                for area in projectData["area"]:
+
+                    for entry in projectData["area"][area]["sarea"]:
+
+                        if entry == portSarea:
+
+                            portArea = projectData["area"][area]["name"]
+
+                item = {
+
+                    "name" : "-",
+                    "image" : "None",
+                    "port" : selection,
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : "-",
+                    "sattr" : "-",
+                    "sarea" : portSarea,
+                    "area" : portArea
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
+
             elif self.CBB_sorting.current() == 3: # - Port - None
 
                 pass
@@ -883,9 +1212,9 @@ class scrMain(): # Main GUI
                 selectionList = [allSattr[sattr] for sattr in selectionIndex]
                 selection = selectionList[0]
 
-                if selection == "(All)":
+                if selection == lang["generalAll"]:
 
-                    if selectionFirst == "(All)":
+                    if selectionFirst == lang["generalAll"]:
 
                         sortList = list()
 
@@ -898,6 +1227,12 @@ class scrMain(): # Main GUI
                         for entry in sortList:
 
                             self.LBX_rdSelect.insert(tk.END, entry)
+
+                        ###############################
+                        #---------setItemInfo---------#
+                        ###############################
+
+                        self.setItemInfo(None)
 
                     else:
 
@@ -930,7 +1265,30 @@ class scrMain(): # Main GUI
                         for entry in sortList:
 
                             self.LBX_rdSelect.insert(tk.END, entry)
+
+                        ###############################
+                        #---------setItemInfo---------#
+                        ###############################
+
+                        item = {
+
+                            "name" : "-",
+                            "image" : "None",
+                            "port" : "-",
+                            "buy" : "-",
+                            "sell" : "-",
+                            "attr" : selectionFirst,
+                            "sattr" : "-",
+                            "sarea" : "-",
+                            "area" : "-"
+
+                        }
+
+                        self.setItemInfo(item)
                 
+                    self.BTN_edit.config(state = "disabled")
+                    self.BTN_remove.config(state = "disabled")
+
                 else:
 
                     itemList = list()
@@ -952,6 +1310,43 @@ class scrMain(): # Main GUI
                     for entry in sortList:
 
                         self.LBX_rdSelect.insert(tk.END, entry)
+
+                    ###############################
+                    #---------setItemInfo---------#
+                    ###############################
+
+                    if selectionFirst == lang["generalAll"]:
+
+                        for attr in projectData["attr"]:
+
+                            for entry in projectData["attr"][attr]["sattr"]:
+
+                                if entry == selection:
+
+                                    sattrMaster = projectData["attr"][attr]["name"]
+
+                    else:
+
+                        sattrMaster = selectionFirst
+
+                    item = {
+
+                        "name" : "-",
+                        "image" : "None",
+                        "port" : "-",
+                        "buy" : "-",
+                        "sell" : "-",
+                        "attr" : sattrMaster,
+                        "sattr" : selection,
+                        "sarea" : "-",
+                        "area" : "-"
+
+                    }
+
+                    self.setItemInfo(item)
+
+                    self.BTN_edit.config(state = "normal")
+                    self.BTN_remove.config(state = "normal")
 
             elif self.CBB_sorting.current() == 5: # - Subttribute - Item
 
@@ -991,7 +1386,28 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
-            self.setItemInfo(None)
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                item = {
+
+                    "name" : projectData["item"][itemID]["name"],
+                    "image" : projectData["item"][itemID]["image"],
+                    "port" : "-",
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : projectData["item"][itemID]["attr"],
+                    "sattr" : projectData["item"][itemID]["sattr"],
+                    "sarea" : "-",
+                    "area" : "-"
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
 
     def LBX_rdSelect_callback(self, event):
 
@@ -1051,6 +1467,45 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                for sarea in projectData["sarea"]:
+
+                    for entry in projectData["sarea"][sarea]["port"]:
+
+                        if entry == selection:
+
+                            portSarea = projectData["sarea"][sarea]["name"]
+
+                for area in projectData["area"]:
+
+                    for entry in projectData["area"][area]["sarea"]:
+
+                        if entry == portSarea:
+
+                            portArea = projectData["area"][area]["name"]
+
+                item = {
+
+                    "name" : "-",
+                    "image" : "None",
+                    "port" : selection,
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : "-",
+                    "sattr" : "-",
+                    "sarea" : portSarea,
+                    "area" : portArea
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
+
             elif self.CBB_sorting.current() == 2: # - Subarea - Port - None
 
                 pass
@@ -1096,11 +1551,32 @@ class scrMain(): # Main GUI
 
                     self.TRW_offer.insert("", "end", values = entry)
 
+                ###############################
+                #---------setItemInfo---------#
+                ###############################
+
+                item = {
+
+                    "name" : projectData["item"][itemID]["name"],
+                    "image" : projectData["item"][itemID]["image"],
+                    "port" : "-",
+                    "buy" : "-",
+                    "sell" : "-",
+                    "attr" : projectData["item"][itemID]["attr"],
+                    "sattr" : projectData["item"][itemID]["sattr"],
+                    "sarea" : "-",
+                    "area" : "-"
+
+                }
+
+                self.setItemInfo(item)
+
+                self.BTN_edit.config(state = "normal")
+                self.BTN_remove.config(state = "normal")
+
             elif self.CBB_sorting.current() == 5: # - Subttribute - Item - None
 
                 pass
-
-            self.setItemInfo(None)
 
     def TRW_offer_callback(self, event):
 
@@ -1196,14 +1672,14 @@ class scrMain(): # Main GUI
                 selectionList = [allItems[item] for item in selectionIndex]
                 activeItem = selectionList[0]
 
-            elif self.CBB_sorting.get() == lang["titleAttr"]:
+            elif self.CBB_sorting.get() == lang["titleAttribute"]:
 
                 allItems = self.LBX_rdSelect.get(0, tk.END)
                 selectionIndex = self.LBX_rdSelect.curselection()
                 selectionList = [allItems[item] for item in selectionIndex]
                 activeItem = selectionList[0]
 
-            elif self.CBB_sorting.get() == lang["titleSubattr"]:
+            elif self.CBB_sorting.get() == lang["titleSubattribute"]:
 
                 allItems = self.LBX_ndSelect.get(0, tk.END)
                 selectionIndex = self.LBX_ndSelect.curselection()
@@ -1258,7 +1734,33 @@ class scrMain(): # Main GUI
 
             self.setItemInfo(item)
 
+    def toplevelDestroy_callback(self, event):
+
+        try:
+
+            scrObjAdd.buttonMainClose(self.addObj)
+
+        except:
+
+            pass
+
+        global eDestroy
+
+        if eDestroy == 0:
+
+            self.browserSetFirstSection()
+
+            eDestroy = 1
+
+        else:
+
+            pass
+
     def objectAdd(self):
+
+        global eDestroy
+
+        eDestroy = 0
 
         self.addObjectScreen = tk.Toplevel(self.master)
         self.addObjectScreen.grab_set()
@@ -1272,6 +1774,9 @@ class scrMain(): # Main GUI
 
         self.addObjectScreen.geometry("+{}+{}".format(positionRight, positionDown))
 
+        self.addObjectScreen.protocol("WM_DELETE_WINDOW", lambda: self.toplevelDestroy_callback(None))
+        self.addObjectScreen.bind("<Destroy>", self.toplevelDestroy_callback)
+
         self.addObj = scrObjAdd(self.addObjectScreen)
 
     def objectEdit(self):
@@ -1282,13 +1787,116 @@ class scrMain(): # Main GUI
 
         self.editObj = scrObjEdit(self.editObjectScreen)
 
+    def objectRemove(self):
+
+        active = self.CBB_sorting.current()
+
+        try:
+
+            allItems = self.LBX_stSelect.get(0, tk.END)
+            selectionIndex = self.LBX_stSelect.curselection()
+            selectionList = [allItems[item] for item in selectionIndex]
+            selectionFst = selectionList[0]
+
+        except:
+
+            selectionFst = None
+
+        try:
+
+            allItems = self.LBX_ndSelect.get(0, tk.END)
+            selectionIndex = self.LBX_ndSelect.curselection()
+            selectionList = [allItems[item] for item in selectionIndex]
+            selectionSnd = selectionList[0]
+
+        except:
+
+            selectionSnd = None
+
+        try:
+
+            allItems = self.LBX_rdSelect.get(0, tk.END)
+            selectionIndex = self.LBX_rdSelect.curselection()
+            selectionList = [allItems[item] for item in selectionIndex]
+            selectionTrd = selectionList[0]
+
+        except:
+
+            selectionTrd = None
+
+        try:
+
+            selectionIndex = self.TRW_offer.selection()
+
+            selectionTRW = list(dict(self.TRW_offer.item(selectionIndex))["values"])[0]
+
+        except:
+
+            selectionIndex = ()
+
+        if selectionIndex == ():
+
+            selectionTRW = None
+
+        if selectionTRW != None:
+
+            delete = 3
+            selection = selectionTRW
+
+        elif selectionTrd != None:
+
+            delete = 2
+            selection = selectionTrd
+
+        elif selectionSnd != None:
+
+            delete = 1
+            selection = selectionSnd
+
+        elif selectionFst != None:
+
+            delete = 0
+            selection = selectionFst
+
+        else:
+
+            return -1
+
+        msgCont = lang["promptObjectRemoveText"].split("/")
+
+        msg = f"{msgCont[0]} {lang['titleEntry']} ({selection}){msgCont[1]}\n{msgCont[2]}\n\n{msgCont[3]}"
+
+        alert = messagebox.askokcancel(f"{lang['programName']} - {lang['promptObjectRemove']}", msg, icon = "warning")
+
+        if alert == True:
+
+            if delete == 0:
+
+                self.objectRemoveFstLBX()
+
+            elif delete == 1:
+
+                self.objectRemoveSndLBX()
+
+            elif delete == 2:
+
+                self.objectRemoveTrdLBX()
+
+            elif delete == 3:
+
+                self.objectRemoveTRW()
+
+        else:
+
+            return -1
+
     def projectNew(self):
 
         global projectData
 
         alertMsgLine1, alertMsgLine2 = str(lang["promptNewProjectAlertText"]).split("/")
 
-        alert = messagebox.askokcancel(title = lang["promptNewProjectAlert"], message = "\n\n".join([alertMsgLine1, alertMsgLine2]))
+        alert = messagebox.askokcancel(title = f"{lang['programName']} - {lang['promptNewProjectAlert']}", message = "\n\n".join([alertMsgLine1, alertMsgLine2]))
 
         if alert == False:
 
@@ -1303,7 +1911,7 @@ class scrMain(): # Main GUI
 
             projectData.clear()
 
-            projectData["name"] = "active"
+            projectData["name"] = "active(None)"
 
             projectData["item"] = dict()
             projectData["area"] = dict()
@@ -1325,7 +1933,7 @@ class scrMain(): # Main GUI
         filePath = filedialog.askopenfilename(
             
             initialdir = (sys.path[0] + "\\save"),
-            title = lang["promptLoadProject"],
+            title = f"{lang['programName']} - {lang['promptLoadProject']}",
             filetypes = (
 
                 (f"{info['name']} Database File",f"*{info['dbExtension']}"),
@@ -1341,7 +1949,9 @@ class scrMain(): # Main GUI
 
         projectData = hand.project().load(filePath)
 
-        projectData["name"] = "active"
+        projName = projectData["name"]
+
+        projectData["name"] = f"active({projName})"
 
         self.browserSetFirstSection()
 
@@ -1372,6 +1982,309 @@ class scrMain(): # Main GUI
         else:
 
             self.frame.quit()
+
+    def objectRemoveFstLBX(self):
+
+        allItems = self.LBX_stSelect.get(0, tk.END)
+        selectionIndex = self.LBX_stSelect.curselection()
+        selectionList = [allItems[item] for item in selectionIndex]
+        selection = selectionList[0]
+
+        active = self.CBB_sorting.current()
+
+        if active == 0: #item
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == selection:
+
+                    itemID = item
+
+            self.projectDelItem(itemID)
+
+            self.browserSetFirstSection()
+
+        if active == 1: #area
+
+            for area in projectData["area"]:
+
+                if projectData["area"][area]["name"] == selection:
+
+                    areaID = area
+
+            self.projectDelArea(areaID)
+
+        elif active == 2: #sarea
+
+            for sarea in projectData["sarea"]:
+
+                if projectData["sarea"][sarea]["name"] == selection:
+
+                    sareaID = sarea
+
+            self.projectDelSarea(sareaID)
+
+        elif active == 3: #port
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"] == selection:
+
+                    portID = port
+
+            self.projectDelPort(portID)
+
+        elif active == 4: #attr
+
+            for attr in projectData["attr"]:
+
+                if projectData["attr"][attr]["name"] == selection:
+
+                    attrID = attr
+
+            self.projectDelAttr(attrID)
+
+        elif active == 5: #sattr
+
+            for sattr in projectData["sattr"]:
+
+                if projectData["sattr"][sattr]["name"] == selection:
+
+                    sattrID = sattr
+
+            self.projectDelSattr(sattrID)
+          
+        self.browserSetFirstSection()
+
+    def objectRemoveSndLBX(self):
+
+        allItems = self.LBX_ndSelect.get(0, tk.END)
+        selectionIndex = self.LBX_ndSelect.curselection()
+        selectionList = [allItems[item] for item in selectionIndex]
+        selection = selectionList[0]
+
+        active = self.CBB_sorting.current()
+
+        if active == 0: #item - none
+
+            pass
+
+        if active == 1: #area - sarea
+
+            for sarea in projectData["sarea"]:
+
+                if projectData["sarea"][sarea]["name"] == selection:
+
+                    sareaID = sarea
+
+            self.projectDelSarea(sareaID)
+
+        elif active == 2: #sarea - port
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"] == selection:
+
+                    portID = port
+
+            self.projectDelPort(portID)
+
+        elif active == 3: #port - none
+
+            pass
+
+        elif active == 4: #attr - sattr
+
+            for sattr in projectData["sattr"]:
+
+                if projectData["sattr"][sattr]["name"] == selection:
+
+                    sattrID = sattr
+
+            self.projectDelSattr(sattrID)
+
+        elif active == 5: #sattr - item
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == selection:
+
+                    itemID = item
+
+            self.projectDelItem(itemID)
+
+            self.browserSetFirstSection()
+          
+        self.browserSetFirstSection()
+
+    def objectRemoveTrdLBX(self):
+
+        allItems = self.LBX_rdSelect.get(0, tk.END)
+        selectionIndex = self.LBX_rdSelect.curselection()
+        selectionList = [allItems[item] for item in selectionIndex]
+        selection = selectionList[0]
+
+        active = self.CBB_sorting.current()
+
+        if active == 0: #item - none - none
+
+            pass
+
+        if active == 1: #area - sarea - port
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"] == selection:
+
+                    portID = port
+
+            self.projectDelPort(portID)
+
+        elif active == 2: #sarea - port - none
+
+            pass
+
+        elif active == 3: #port - none - none
+
+            pass
+
+        elif active == 4: #attr - sattr - item
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == selection:
+
+                    itemID = item
+
+            self.projectDelItem(itemID)
+
+            self.browserSetFirstSection()
+
+        elif active == 5: #sattr - item - none
+
+            pass
+          
+        self.browserSetFirstSection()
+
+    def objectRemoveTRW(self):
+
+        activeSelection = self.TRW_offer.selection()
+
+        selection = list(dict(self.TRW_offer.item(activeSelection))["values"])[0]
+
+        active = self.CBB_sorting.current()
+
+        if active == 0 or active == 4 or active == 5: #item, attr, sattr
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"] == selection:
+
+                    portID = port
+
+            self.projectDelPort(portID)
+
+        elif active == 1 or active == 2 or active == 3: #area, sarea, port
+
+            for item in projectData["item"]:
+
+                if projectData["item"][item]["name"] == selection:
+
+                    itemID = item
+
+            self.projectDelItem(itemID)
+
+        self.browserSetFirstSection()            
+
+    def projectDelItem(self, itemID):
+
+        del projectData["item"][itemID]
+
+    def projectDelArea(self, areaID):
+
+        delSarea = list()
+
+        for sarea in projectData["area"][areaID]["sarea"]:
+
+            for entry in projectData["sarea"]:
+
+                if projectData["sarea"][entry]["name"] == sarea:
+
+                    delSarea.append(entry)
+
+        for entry in delSarea:
+
+            self.projectDelSarea(entry)
+
+        del projectData["area"][areaID]
+
+    def projectDelSarea(self, sareaID):
+
+        delPort = list()
+
+        for port in projectData["sarea"][sareaID]["port"]:
+
+            for entry in projectData["port"]:
+
+                if projectData["port"][entry]["name"] == port:
+
+                    delPort.append(entry)
+
+        for entry in delPort:
+
+            self.projectDelPort(entry)
+
+        del projectData["sarea"][sareaID]
+
+    def projectDelPort(self, portID):
+
+        delItem = list()
+
+        for item in projectData["item"]:
+
+            if projectData["port"][portID]["name"] in projectData["item"][item]["port"]:
+
+                delItem.append(item)
+
+        for item in delItem:
+
+            del projectData["item"][item]["port"][projectData["port"][portID]["name"]]
+
+        del projectData["port"][portID]
+
+    def projectDelAttr(self, attrID):
+
+        delSattr = list()
+
+        for sattr in projectData["attr"][attrID]["sattr"]:
+
+            for entry in projectData["sattr"]:
+
+                if projectData["sattr"][entry]["name"] == sattr:
+
+                    delSattr.append(entry)
+
+        for entry in delSattr:
+
+            self.projectDelSattr(entry)
+
+        del projectData["attr"][attrID]
+
+    def projectDelSattr(self, sattrID):
+
+        delItem = list()
+
+        for item in projectData["item"]:
+
+            if projectData["sattr"][sattrID]["name"] in projectData["item"][item]["sattr"]:
+
+                delItem.append(item)
+
+        for item in delItem:
+
+            del projectData["item"][item]["sattr"][projectData["sattr"][sattrID]["name"]]
+
+        del projectData["sattr"][sattrID]
 
     def setItemInfo(self, item):
 
@@ -1445,6 +2358,9 @@ class scrMain(): # Main GUI
         self.LBX_rdSelect.delete(0, tk.END)
         self.TRW_offer.delete(*self.TRW_offer.get_children())
 
+        self.BTN_edit.config(state = "disabled")
+        self.BTN_remove.config(state = "disabled")
+
         if activeSorting == lang["titleItem"]:
 
             sortList = list()
@@ -1471,7 +2387,7 @@ class scrMain(): # Main GUI
 
             if len(projectData["area"]) > 1:
 
-                self.LBX_stSelect.insert(tk.END, "(All)")
+                self.LBX_stSelect.insert(tk.END, lang["generalAll"])
 
             for entry in sortList:
 
@@ -1489,7 +2405,7 @@ class scrMain(): # Main GUI
 
             if len(projectData["sarea"]) > 1:
 
-                self.LBX_stSelect.insert(tk.END, "(All)")
+                self.LBX_stSelect.insert(tk.END, lang["generalAll"])
 
             for entry in sortList:
 
@@ -1521,7 +2437,7 @@ class scrMain(): # Main GUI
 
             if len(projectData["attr"]) > 1:
 
-                self.LBX_stSelect.insert(tk.END, "(All)")
+                self.LBX_stSelect.insert(tk.END, lang["generalAll"])
 
             for entry in sortList:
 
@@ -1539,7 +2455,7 @@ class scrMain(): # Main GUI
 
             if len(projectData["sattr"]) > 1:
 
-                self.LBX_stSelect.insert(tk.END, "(All)")
+                self.LBX_stSelect.insert(tk.END, lang["generalAll"])
 
             for entry in sortList:
 
@@ -1551,6 +2467,8 @@ class scrObjAdd:
 
         self.master = master
         self.frame = ttk.Frame(self.master)
+
+        self.master.title(f"{lang['programName']} - {lang['promptObjectAdd']}")
         
         ########################################
         # --------- Creating Widgets --------- #
@@ -1579,7 +2497,7 @@ class scrObjAdd:
 
         self.FRM_ntbPort.columnconfigure(0, weight = 1)
         self.FRM_ntbPort.columnconfigure(1, weight = 1)
-        
+
         self.FRM_ntbAttr = ttk.Frame(self.NTB_main)
 
         self.FRM_ntbAttr.columnconfigure(0, weight = 1)
@@ -1589,14 +2507,14 @@ class scrObjAdd:
 
         self.FRM_ntbSattr.columnconfigure(0, weight = 1)
         self.FRM_ntbSattr.columnconfigure(1, weight = 1)
-
+        
         self.NTB_main.add(self.FRM_ntbItem, text = lang["titleItem"])
         self.NTB_main.add(self.FRM_ntbArea, text = lang["titleArea"])
         self.NTB_main.add(self.FRM_ntbSarea, text = lang["titleSubarea"])
         self.NTB_main.add(self.FRM_ntbPort, text = lang["titlePort"])
         self.NTB_main.add(self.FRM_ntbAttr, text = lang["titleAttribute"])
         self.NTB_main.add(self.FRM_ntbSattr, text = lang["titleSubattribute"])
-
+        
         self.NTB_main.bind("<<NotebookTabChanged>>", self.NTB_main_callback)
 
         # --- Register #01 - Items --- name, available Ports with value, attr, subattr
@@ -1748,7 +2666,7 @@ class scrObjAdd:
         self.FRM_buttons = ttk.Frame(self.frame)
 
         self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"], command = self.buttonMainAdd)
-        self.BTN_cancel = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralCancel"], command = self.buttonMainCancel)
+        self.BTN_close = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralClose"], command = self.buttonMainClose)
 
         ######################################
         # --------- Allign Widgets --------- #
@@ -1856,7 +2774,7 @@ class scrObjAdd:
         # --- Main Buttons ---
 
         self.BTN_add.grid(column = 0, row = 0)
-        self.BTN_cancel.grid(column = 1, row = 0)
+        self.BTN_close.grid(column = 1, row = 0)
 
         self.FRM_buttons.grid(column = 0, row = 1, sticky = (tk.E), padx = 4, pady = 3)
 
@@ -2139,9 +3057,355 @@ class scrObjAdd:
 
     def buttonMainAdd(self):
 
-        print("buttonMainAdd")
+        active = self.NTB_main.index(self.NTB_main.select())
 
-    def buttonMainCancel(self):
+        if active == 0: #item
+
+            itemName = self.ETY_nbtItemName.get()
+            itemImage = self.ETY_nbtItemImageEntry.get()
+            itemAttr = self.CBB_nbtItemAttr.get()
+            itemSattr = self.CBB_nbtItemSattr.get()
+
+            if itemImage == "":
+
+                itemImage = "None"
+
+            trwEntries = self.TRW_nbtItemPortTree.get_children()
+
+            itemPort = dict()
+
+            for entry in trwEntries:
+
+                port = dict(self.TRW_nbtItemPortTree.item(entry))["values"]
+
+                value = f"{port[1]}-{port[2]}"
+
+                itemPort[port[0]] = value
+
+            if itemName == "" or itemAttr == "" or itemSattr == "":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for item in projectData["item"]:
+
+                if str(projectData["item"][item]["name"]).lower() == itemName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                itemID = f"item{count:06d}"
+
+                if itemID in projectData["item"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["item"][itemID] = dict()
+
+            projectData["item"][itemID]["name"] = itemName
+            projectData["item"][itemID]["image"] = itemImage
+            projectData["item"][itemID]["port"] = itemPort
+            projectData["item"][itemID]["attr"] = itemAttr
+            projectData["item"][itemID]["sattr"] = itemSattr
+
+        elif active == 1: #area
+
+            areaName = self.ETY_nbtAreaName.get()
+
+            if areaName == "":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for area in projectData["area"]:
+
+                if str(projectData["area"][area]["name"]).lower() == areaName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                areaID = f"area{count:06d}"
+
+                if areaID in projectData["area"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["area"][areaID] = dict()
+
+            projectData["area"][areaID]["name"] = areaName
+            projectData["area"][areaID]["sarea"] = list()
+
+        elif active == 2: #sarea
+
+            sareaName = self.ETY_nbtSareaName.get()
+            sareaMaster = self.CBB_nbtSareaMaster.get()
+
+            if sareaName == "" or sareaMaster == f"-- {lang['titleArea'].lower()} --":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for sarea in projectData["sarea"]:
+
+                if str(projectData["sarea"][sarea]["name"]).lower() == sareaName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                sareaID = f"sarea{count:06d}"
+
+                if sareaID in projectData["sarea"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["sarea"][sareaID] = dict()
+
+            projectData["sarea"][sareaID]["name"] = sareaName
+            projectData["sarea"][sareaID]["port"] = list()
+
+            for area in projectData["area"]:
+
+                if projectData["area"][area]["name"] == sareaMaster:
+
+                    areaID = area
+
+            projectData["area"][areaID]["sarea"].append(sareaName)
+
+        elif active == 3: #port
+
+            portName = self.ETY_nbtPortName.get()
+            portArea = self.CBB_nbtPortArea.get()
+            portSarea = self.CBB_nbtPortSarea.get()
+
+            trwEntries = self.TRW_nbtPortItemTree.get_children()
+
+            portItem = dict()
+
+            for entry in trwEntries:
+
+                item = dict(self.TRW_nbtPortItemTree.item(entry))["values"]
+
+                value = f"{item[1]}-{item[2]}"
+
+                portItem[item[0]] = value
+
+            for entry in portItem:
+
+                for item in projectData["item"]:
+
+                    if projectData["item"][item]["name"] == entry:
+
+                        projectData["item"][item]["port"][portName] = portItem[entry]
+
+            for sarea in projectData["sarea"]:
+
+                if projectData["sarea"][sarea]["name"] == portSarea:
+
+                    projectData["sarea"][sarea]["port"].append(portName)
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                portID = f"port{count:06d}"
+
+                if portID in projectData["port"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["port"][portID] = dict()
+
+            projectData["port"][portID]["name"] = portName
+
+        elif active == 4: #attr
+
+            attrName = self.ETY_nbtAttrName.get()
+
+            if attrName == "":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for attr in projectData["attr"]:
+
+                if str(projectData["attr"][attr]["name"]).lower() == attrName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                attrID = f"attr{count:06d}"
+
+                if attrID in projectData["attr"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["attr"][attrID] = dict()
+
+            projectData["attr"][attrID]["name"] = attrName
+            projectData["attr"][attrID]["sattr"] = list()
+
+        elif active == 5: #sattr
+
+            sattrName = self.ETY_nbtSattrName.get()
+            sattrMaster = self.CBB_nbtSattrMaster.get()
+
+            if sattrName == "" or sattrMaster == f"-- {lang['titleAttribute'].lower()} --":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for sattr in projectData["sattr"]:
+
+                if str(projectData["sattr"][sattr]["name"]).lower() == sattrName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = info["name"] + " - v. " + info["ver"] + "." + info["subVer"]
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            check = False
+            count = 0
+
+            while check != True:
+
+                if count >= 1000000:
+
+                    return -1
+
+                sattrID = f"sattr{count:06d}"
+
+                if sattrID in projectData["sattr"]:
+
+                    check = True
+
+                else:
+
+                    count += 1
+
+            projectData["sattr"][sattrID] = dict()
+
+            projectData["sattr"][sattrID]["name"] = sattrName
+
+            for attr in projectData["attr"]:
+
+                if projectData["attr"][attr]["name"] == sattrMaster:
+
+                    attrID = attr
+
+            projectData["attr"][attrID]["sattr"].append(sattrName)
+
+        self.getInitialValues()
+
+    def buttonMainClose(self):
 
         self.master.destroy()
 
