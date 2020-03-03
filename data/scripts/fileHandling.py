@@ -31,95 +31,28 @@ class project:
 
     def load(self, filePath):
 
-        with open(filePath, "r") as file:
+        try:
 
-            data = json.load(file)
+            with open(filePath, "r") as file:
+
+                data = json.load(file)
+
+        except:
+
+            return -1
 
         return data
 
-        """itemData = item().get(filePath)
-        areaData = area().get(filePath)
-        sareaData = subarea().get(filePath)
-        attrData = attribute().get(filePath)
+    def save(self, filePath, data):
 
-        return itemData, areaData, sareaData, attrData
+        try:
 
-class item:
+            with open(filePath, "w") as file:
 
-    def get(self, dataPath):
-
-        if project == "None":
+                json.dump(data, file)
+            
+        except:
 
             return -1
 
-        else:
-
-            fileData = (dataPath)
-
-            with open(fileData) as file:
-
-                data = json.load(file)
-
-            items = data["item"]
-
-            return items
-
-class area:
-
-    def get(self, dataPath):
-
-        if project == "None":
-
-            return -1
-
-        else:
-
-            fileData = (dataPath)
-
-            with open(fileData) as file:
-
-                data = json.load(file)
-
-            areas = data["area"]
-
-            return areas
-
-class subarea:
-
-    def get(self, dataPath):
-
-        if project == "None":
-
-            return -1
-
-        else:
-
-            fileData = (dataPath)
-
-            with open(fileData) as file:
-
-                data = json.load(file)
-
-            subareas = data["sarea"]
-
-            return subareas
-
-class attribute:
-
-    def get(self, dataPath):
-
-        if project == "None":
-
-            return -1
-
-        else:
-
-            fileData = (dataPath)
-
-            with open(fileData) as file:
-
-                data = json.load(file)
-
-            attributes = data["attr"]
-
-            return attributes"""
+        return 0
