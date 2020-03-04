@@ -189,7 +189,7 @@ class scrMain(): # Main GUI
         self.BTN_edit = ttk.Button(self.FRM_buttons, text = lang["buttonObjectEdit"], width = 16, command = self.objectEdit, state = "disabled")
         self.BTN_remove = ttk.Button(self.FRM_buttons, text = lang["buttonObjectRemove"], width = 16, command = self.objectRemove, state = "disabled")
         self.BTN_new = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectNew"], width = 34, command = lambda deleteCallback = False: self.projectNew(deleteCallback))
-        self.BTN_save = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectSave"], width = 16, command = lambda filePath = projectDataPath: self.projectSave(filePath))
+        self.BTN_save = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectSave"], width = 16, command = lambda: self.projectSave(None))
         self.BTN_saveAs = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectSaveAs"], width = 16, command = lambda saveCallback = False: self.projectSaveAs(saveCallback))
         self.BTN_load = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectLoad"], width = 34, command = self.projectLoad)
         self.BTN_delete = ttk.Button(self.FRM_Subbuttons, text = lang["buttonProjectDelete"], width = 34, command = self.projectDelete, state = "disabled")
@@ -448,7 +448,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][itemID]["port"][port]
 
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((port, buy, sell))
 
@@ -693,7 +693,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][entry]["port"][selection]
                     
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((name, buy, sell))
 
@@ -1128,7 +1128,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][entry]["port"][selection]
                     
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((name, buy, sell))
 
@@ -1373,7 +1373,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][itemID]["port"][port]
 
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((port, buy, sell))
 
@@ -1454,7 +1454,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][entry]["port"][selection]
                     
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((name, buy, sell))
 
@@ -1538,7 +1538,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][itemID]["port"][port]
 
-                    buy, sell = value.split("-")
+                    buy, sell = value.split("|")
 
                     insertList.append((port, buy, sell))
 
@@ -1620,7 +1620,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][itemID]["port"][port]
 
-                    itemBuy, itemSell = value.split("-")
+                    itemBuy, itemSell = value.split("|")
 
             for sarea in projectData["sarea"]:
 
@@ -1713,7 +1713,7 @@ class scrMain(): # Main GUI
 
                     value = projectData["item"][item]["port"][entry]
 
-                    itemBuy, itemSell = value.split("-")
+                    itemBuy, itemSell = value.split("|")
 
             item = {
 
@@ -2316,12 +2316,19 @@ class scrMain(): # Main GUI
     def projectSave(self, filePath):
 
         global projectDataPath
+        global projectChanges
+
+        filePath = projectDataPath
 
         info = hand.general().getIniCont(infoPath)
 
         if filePath == None:
 
             filePath = self.projectSaveAs(True)
+
+            if filePath == -1:
+
+                return -1
 
         savePD = projectData.copy()
 
@@ -2336,6 +2343,8 @@ class scrMain(): # Main GUI
         projectDataPath = filePath
 
         self.BTN_delete.config(state = "normal")
+
+        projectChanges = False
 
     def projectLoad(self):
 
@@ -3585,7 +3594,7 @@ class scrObjAdd:
 
                 port = dict(self.TRW_nbtItemPortTree.item(entry))["values"]
 
-                value = f"{port[1]}-{port[2]}"
+                value = f"{port[1]}|{port[2]}"
 
                 itemPort[port[0]] = value
 
@@ -3785,7 +3794,7 @@ class scrObjAdd:
 
                 item = dict(self.TRW_nbtPortItemTree.item(entry))["values"]
 
-                value = f"{item[1]}-{item[2]}"
+                value = f"{item[1]}|{item[2]}"
 
                 portItem[item[0]] = value
 
@@ -4422,7 +4431,7 @@ class scrObjEdit:
             for port in projectData["item"][toEdit]["port"]:
 
                 portName = port
-                portBuy, portSell = projectData["item"][toEdit]["port"][port].split("-")
+                portBuy, portSell = projectData["item"][toEdit]["port"][port].split("|")
 
                 entryList.append((portName, portBuy, portSell))
 
@@ -4520,7 +4529,7 @@ class scrObjEdit:
                     if port == projectData["port"][toEdit]["name"]:
 
                         itemName = projectData["item"][item]["name"]
-                        itemBuy, itemSell = projectData["item"][item]["port"][port].split("-")
+                        itemBuy, itemSell = projectData["item"][item]["port"][port].split("|")
 
                         entryList.append((itemName, itemBuy, itemSell))
 
@@ -4756,7 +4765,7 @@ class scrObjEdit:
 
                 port = dict(self.TRW_nbtItemPortTree.item(entry))["values"]
 
-                value = f"{port[1]}-{port[2]}"
+                value = f"{port[1]}|{port[2]}"
 
                 itemPort[port[0]] = value
 
@@ -4816,10 +4825,12 @@ class scrObjEdit:
 
                     return -1
 
+            sarea = projectData["area"][toEdit]["sarea"]
+
             projectData["area"][toEdit] = dict()
 
             projectData["area"][toEdit]["name"] = areaName
-            projectData["area"][toEdit]["sarea"] = list()
+            projectData["area"][toEdit]["sarea"] = sarea
 
         elif active == 2: #sarea
 
@@ -4858,10 +4869,12 @@ class scrObjEdit:
 
             projectData["area"][areaID]["sarea"].remove(projectData["sarea"][toEdit]["name"])
 
+            portList = projectData["sarea"][toEdit]["port"]
+
             projectData["sarea"][toEdit] = dict()
 
             projectData["sarea"][toEdit]["name"] = sareaName
-            projectData["sarea"][toEdit]["port"] = list()
+            projectData["sarea"][toEdit]["port"] = portList
 
             for area in projectData["area"]:
 
@@ -4885,7 +4898,7 @@ class scrObjEdit:
 
                 item = dict(self.TRW_nbtPortItemTree.item(entry))["values"]
 
-                value = f"{item[1]}-{item[2]}"
+                value = f"{item[1]}|{item[2]}"
 
                 portItem[item[0]] = value
 
@@ -4896,6 +4909,14 @@ class scrObjEdit:
                     if projectData["item"][item]["name"] == entry:
 
                         projectData["item"][item]["port"][portName] = portItem[entry]
+
+            for sarea in projectData["sarea"]:
+
+                for entry in projectData["sarea"][sarea]["port"]:
+
+                    if entry == projectData["port"][toEdit]["name"]:
+
+                        projectData["sarea"][sarea]["port"].remove(projectData["port"][toEdit]["name"])
 
             for sarea in projectData["sarea"]:
 
@@ -4954,11 +4975,13 @@ class scrObjEdit:
                     messagebox.showinfo(title, lang["promptGeneralNameTaken"])
 
                     return -1
+
+            sattr = projectData["attr"][toEdit]["sattr"]
                     
             projectData["attr"][toEdit] = dict()
 
             projectData["attr"][toEdit]["name"] = attrName
-            projectData["attr"][toEdit]["sattr"] = list()
+            projectData["attr"][toEdit]["sattr"] = sattr
 
         elif active == 5: #sattr
 

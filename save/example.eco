@@ -5,11 +5,11 @@
             "name": "9mm-Light",
             "image": "None",
             "port": {
-                "Tethys": "50-5",
-                "Phoebe": "52-7",
-                "Rhea": "54-9",
-                "Atlas": "56-11",
-                "Perses": "58-13"
+                "Tethys": "50|5",
+                "Phoebe": "52|7",
+                "Rhea": "54|9",
+                "Atlas": "56|11",
+                "Perses": "58|13"
             },
             "attr": "Gunnery",
             "sattr": "Ammunition"
@@ -18,10 +18,10 @@
             "name": "50mm-Light",
             "image": "None",
             "port": {
-                "Hyperion": "100-10",
-                "Phoebe": "102-12",
-                "Cronus": "104-14",
-                "Astraeus": "106-16"
+                "Hyperion": "100|10",
+                "Phoebe": "102|12",
+                "Cronus": "104|14",
+                "Astraeus": "106|16"
             },
             "attr": "Gunnery",
             "sattr": "Ammunition"
@@ -30,8 +30,8 @@
             "name": "Pistol",
             "image": "None",
             "port": {
-                "Cronus": "200-50",
-                "Phoebe": "202-52"
+                "Cronus": "200|50",
+                "Phoebe": "202|52"
             },
             "attr": "Gunnery",
             "sattr": "Guns"
@@ -40,8 +40,8 @@
             "name": "Switcher",
             "image": "None",
             "port": {
-                "Coeus": "2000-1000",
-                "Astraeus": "2500-1000"
+                "Coeus": "2000|1000",
+                "Astraeus": "2500|1000"
             },
             "attr": "Ships",
             "sattr": "Causo-class"
@@ -50,8 +50,8 @@
             "name": "Charger",
             "image": "None",
             "port": {
-                "Coeus": "4000-1500",
-                "Astraeus": "4000-2000"
+                "Coeus": "4000|1500",
+                "Astraeus": "4000|2000"
             },
             "attr": "Ships",
             "sattr": "Hudo-class"
