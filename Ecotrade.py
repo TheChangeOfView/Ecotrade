@@ -3311,11 +3311,13 @@ class scrObjAdd:
 
         entryList = list()
 
-        entryList.append(f"-- {lang['titleItem'].lower()} --")
-
         for item in projectData["item"]:
 
             entryList.append(projectData["item"][item]["name"])
+
+        entryList.sort()
+
+        entryList.insert(0, f"-- {lang['titleItem'].lower()} --")
 
         self.CBB_nbtPortItemEntry.config(values = entryList)
         self.CBB_nbtPortItemEntry.current(0)
@@ -3324,11 +3326,13 @@ class scrObjAdd:
 
         entryList = list()
 
-        entryList.append(f"-- {lang['titlePort'].lower()} --")
-
         for port in projectData["port"]:
 
             entryList.append(projectData["port"][port]["name"])
+
+        entryList.sort()
+
+        entryList.insert(0, f"-- {lang['titlePort'].lower()} --")
 
         self.CBB_nbtItemPortEntry.config(values = entryList)
         self.CBB_nbtItemPortEntry.current(0)
@@ -3337,11 +3341,13 @@ class scrObjAdd:
 
         entryList = list()
 
-        entryList.append(f"-- {lang['titleAttribute'].lower()} --")
-
         for attr in projectData["attr"]:
 
             entryList.append(projectData["attr"][attr]["name"])
+
+        entryList.sort()
+
+        entryList.insert(0, f"-- {lang['titleAttribute'].lower()} --")
 
         self.CBB_nbtItemAttr.config(values = entryList)
         self.CBB_nbtItemAttr.current(0)
@@ -3357,11 +3363,13 @@ class scrObjAdd:
 
         entryList = list()
 
-        entryList.append(f"-- {lang['titleArea'].lower()} --")
-
         for area in projectData["area"]:
 
             entryList.append(projectData["area"][area]["name"])
+
+        entryList.sort()
+
+        entryList.insert(0, f"-- {lang['titleArea'].lower()} --")
 
         self.CBB_nbtPortArea.config(values = entryList)
         self.CBB_nbtPortArea.current(0)
@@ -4404,6 +4412,8 @@ class scrObjEdit:
 
                 entryList.append(projectData["attr"][attr]["name"])
 
+            entryList.sort()
+
             self.CBB_nbtItemAttr.config(values = entryList)
 
             self.CBB_nbtItemAttr.set(projectData["item"][toEdit]["attr"])
@@ -4419,6 +4429,8 @@ class scrObjEdit:
             for sattr in projectData["attr"][attrID]["sattr"]:
 
                 entryList.append(sattr)
+
+            entryList.sort()
 
             entryList.insert(0, f"-- {lang['titleSubattribute'].lower()} --")
 
@@ -4441,11 +4453,13 @@ class scrObjEdit:
 
             entryList.clear()
 
-            entryList.append(f"-- {lang['titlePort'].lower()} --")
-
             for port in projectData["port"]:
 
                 entryList.append(projectData["port"][port]["name"])
+
+            entryList.sort()
+
+            entryList.insert(0, f"-- {lang['titlePort'].lower()} --")
 
             self.CBB_nbtItemPortEntry.config(values = entryList)
             self.CBB_nbtItemPortEntry.current(0)
@@ -4466,6 +4480,8 @@ class scrObjEdit:
             for area in projectData["area"]:
 
                 entryList.append(projectData["area"][area]["name"])
+
+            entryList.sort()
 
             self.CBB_nbtSareaMaster.config(values = entryList)
 
@@ -4488,6 +4504,8 @@ class scrObjEdit:
             for area in projectData["area"]:
 
                 entryList.append(projectData["area"][area]["name"])
+
+            entryList.sort()
 
             self.CBB_nbtPortArea.config(values = entryList)
 
@@ -4512,6 +4530,8 @@ class scrObjEdit:
             for sarea in projectData["area"][areaID]["sarea"]:
 
                 entryList.append(sarea)
+
+            entryList.sort()
 
             entryList.insert(0, f"-- {lang['titleSubarea'].lower()} --")
 
@@ -4539,11 +4559,13 @@ class scrObjEdit:
 
             entryList = list()
 
-            entryList.append(f"-- {lang['titleItem'].lower()} --")
-
             for item in projectData["item"]:
 
                 entryList.append(projectData["item"][item]["name"])
+
+            entryList.sort()
+
+            entryList.insert(0, f"-- {lang['titleItem'].lower()} --")
 
             self.CBB_nbtPortItemEntry.config(values = entryList)
             self.CBB_nbtPortItemEntry.current(0)
@@ -4564,6 +4586,8 @@ class scrObjEdit:
             for attr in projectData["attr"]:
 
                 entryList.append(projectData["attr"][attr]["name"])
+
+            entryList.sort()
 
             self.CBB_nbtSattrMaster.config(values = entryList)
 
@@ -4603,6 +4627,8 @@ class scrObjEdit:
             for sattr in projectData["attr"][attrID]["sattr"]:
 
                 sattrList.append(sattr)
+
+            sattrList.sort()
 
             sattrList.insert(0, f"-- {lang['titleSubattribute'].lower()} --")
 
@@ -4647,6 +4673,8 @@ class scrObjEdit:
             for sarea in projectData["area"][areaID]["sarea"]:
 
                 sareaList.append(sarea)
+
+            sareaList.sort()
 
             sareaList.insert(0, f"-- {lang['titleSubarea'].lower()} --")
 
