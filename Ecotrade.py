@@ -4869,7 +4869,7 @@ class scrObjEdit:
 
                     areaID = area
 
-            projectData["area"][areaID]["sarear"].append(sareaName)
+            projectData["area"][areaID]["sarea"].append(sareaName)
 
         elif active == 3: #port
 
