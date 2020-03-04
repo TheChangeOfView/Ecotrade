@@ -17,6 +17,18 @@ class general:
 
         return content
 
+    def setIniCont(self, filePath, toWrite):
+
+        #content = list()
+
+        #content = toWrite.split("\n")
+
+        with open(filePath, "w") as file:
+
+            for line in toWrite:
+
+                file.write(line)
+
     def getLang(self, filePath):
 
         activeSettings = self.getIniCont(filePath)

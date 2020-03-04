@@ -54,7 +54,7 @@ def main(): # Main Function
 
 class scrMain(): # Main GUI
     
-    def __init__(self, master = None): # GUI Init
+    def __init__(self, master = None):
         
         #--- Initialize Variables
         
@@ -1749,6 +1749,14 @@ class scrMain(): # Main GUI
             
             pass
 
+        try:
+
+            scrSettings.buttonClose(self.settings)
+
+        except:
+
+            pass
+
         global eDestroy
 
         if eDestroy == 0:
@@ -1875,11 +1883,23 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionFst:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             elif edit == 3:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionTRW:
+
+                        portID = entry
+
+                toEdit = portID
 
             else:
 
@@ -1889,19 +1909,43 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "area"
+                for entry in projectData["area"]:
+
+                    if projectData["area"][entry]["name"] == selectionFst:
+
+                        areaID = entry
+
+                toEdit = areaID
 
             elif edit == 1:
 
-                toEdit = "sarea"
+                for entry in projectData["sarea"]:
+
+                    if projectData["sarea"][entry]["name"] == selectionSnd:
+
+                        sareaID = entry
+
+                toEdit = sareaID
 
             elif edit == 2:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionTrd:
+
+                        portID = entry
+
+                toEdit = portID
 
             elif edit == 3:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionTRW:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             else:
 
@@ -1911,15 +1955,33 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "sarea"
+                for entry in projectData["sarea"]:
+
+                    if projectData["sarea"][entry]["name"] == selectionFst:
+
+                        sareaID = entry
+
+                toEdit = sareaID
 
             elif edit == 1:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionSnd:
+
+                        portID = entry
+
+                toEdit = portID
 
             elif edit == 3:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionTRW:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             else:
 
@@ -1929,11 +1991,23 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionFst:
+
+                        portID = entry
+
+                toEdit = portID
 
             elif edit == 3:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionTRW:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             else:
 
@@ -1943,19 +2017,43 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "attr"
+                for entry in projectData["attr"]:
+
+                    if projectData["attr"][entry]["name"] == selectionFst:
+
+                        attrID = entry
+
+                toEdit = attrID
 
             elif edit == 1:
 
-                toEdit = "sattr"
+                for entry in projectData["sattr"]:
+
+                    if projectData["sattr"][entry]["name"] == selectionSnd:
+
+                        sattrID = entry
+
+                toEdit = sattrID
 
             elif edit == 2:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionTrd:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             elif edit == 3:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionTRW:
+
+                        portID = entry
+
+                toEdit = portID
 
             else:
 
@@ -1965,15 +2063,33 @@ class scrMain(): # Main GUI
 
             if edit == 0:
 
-                toEdit = "sattr"
+                for entry in projectData["sattr"]:
+
+                    if projectData["sattr"][entry]["name"] == selectionFst:
+
+                        sattrID = entry
+
+                toEdit = sattrID
 
             elif edit == 1:
 
-                toEdit = "item"
+                for entry in projectData["item"]:
+
+                    if projectData["item"][entry]["name"] == selectionSnd:
+
+                        itemID = entry
+
+                toEdit = itemID
 
             elif edit == 3:
 
-                toEdit = "port"
+                for entry in projectData["port"]:
+
+                    if projectData["port"][entry]["name"] == selectionTRW:
+
+                        portID = entry
+
+                toEdit = portID
 
             else:
 
@@ -2297,9 +2413,24 @@ class scrMain(): # Main GUI
 
     def openSettings(self):
 
+        global eDestroy
+
+        eDestroy = 0
+
         self.settingsScreen = tk.Toplevel(self.master)
         self.settingsScreen.grab_set()
         self.settingsScreen.resizable(height = False, width = False)
+
+        windowWidth = 320
+        windowHeight = 486
+        
+        positionRight = int(self.settingsScreen.winfo_screenwidth()/2 - windowWidth/2)
+        positionDown = int(self.settingsScreen.winfo_screenheight()/2 - windowHeight/2)
+
+        self.settingsScreen.geometry("+{}+{}".format(positionRight, positionDown))
+
+        self.settingsScreen.protocol("WM_DELETE_WINDOW", lambda: self.toplevelDestroy_callback(None))
+        self.settingsScreen.bind("<Destroy>", self.toplevelDestroy_callback)
 
         self.settings = scrSettings(self.settingsScreen)
 
@@ -3470,7 +3601,7 @@ class scrObjAdd:
 
             for item in projectData["item"]:
 
-                if str(projectData["item"][item]["name"]).lower() == itemName.lower():
+                if projectData["item"][item]["name"].lower() == itemName.lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -3531,7 +3662,7 @@ class scrObjAdd:
 
             for area in projectData["area"]:
 
-                if str(projectData["area"][area]["name"]).lower() == areaName.lower():
+                if projectData["area"][area]["name"].lower() == areaName.lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -3590,7 +3721,7 @@ class scrObjAdd:
 
             for sarea in projectData["sarea"]:
 
-                if str(projectData["sarea"][sarea]["name"]).lower() == sareaName.lower():
+                if projectData["sarea"][sarea]["name"].lower() == sareaName.lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -3672,6 +3803,28 @@ class scrObjAdd:
 
                     projectData["sarea"][sarea]["port"].append(portName)
 
+            if portName == "" or portArea == "" or portSarea == "":
+
+                info = hand.general().getIniCont(infoPath)
+
+                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
+
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
+
+                return -1
+
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"].lower() == portName.lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
             check = False
             count = 0
 
@@ -3719,7 +3872,7 @@ class scrObjAdd:
 
             for attr in projectData["attr"]:
 
-                if str(projectData["attr"][attr]["name"]).lower() == attrName.lower():
+                if projectData["attr"][attr]["name"].lower() == attrName.lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -3778,7 +3931,7 @@ class scrObjAdd:
 
             for sattr in projectData["sattr"]:
 
-                if str(projectData["sattr"][sattr]["name"]).lower() == sattrName.lower():
+                if projectData["sattr"][sattr]["name"].lower() == sattrName.lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4037,7 +4190,7 @@ class scrObjEdit:
 
         self.FRM_buttons = ttk.Frame(self.frame)
 
-        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"], command = self.buttonMainAdd)
+        self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralSave"], command = lambda: self.buttonMainSave(toEdit))
         self.BTN_close = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralClose"], command = self.buttonMainClose)
 
         ######################################
@@ -4158,7 +4311,9 @@ class scrObjEdit:
 
         self.frame.pack()
 
-        if toEdit == "item":
+        edit = toEdit[:-6]
+
+        if edit == "item":
 
             self.NTB_main.select(0)
 
@@ -4168,7 +4323,7 @@ class scrObjEdit:
             self.NTB_main.tab(4, state = "disabled")
             self.NTB_main.tab(5, state = "disabled")
 
-        elif toEdit == "area":
+        elif edit == "area":
 
             self.NTB_main.select(1)
 
@@ -4178,7 +4333,7 @@ class scrObjEdit:
             self.NTB_main.tab(4, state = "disabled")
             self.NTB_main.tab(5, state = "disabled")
 
-        elif toEdit == "sarea":
+        elif edit == "sarea":
 
             self.NTB_main.select(2)
 
@@ -4188,7 +4343,7 @@ class scrObjEdit:
             self.NTB_main.tab(4, state = "disabled")
             self.NTB_main.tab(5, state = "disabled")
 
-        elif toEdit == "port":
+        elif edit == "port":
 
             self.NTB_main.select(3)
 
@@ -4198,7 +4353,7 @@ class scrObjEdit:
             self.NTB_main.tab(4, state = "disabled")
             self.NTB_main.tab(5, state = "disabled")
 
-        elif toEdit == "attr":
+        elif edit == "attr":
 
             self.NTB_main.select(4)
 
@@ -4208,7 +4363,7 @@ class scrObjEdit:
             self.NTB_main.tab(3, state = "disabled")
             self.NTB_main.tab(5, state = "disabled")
 
-        elif toEdit == "sattr":
+        elif edit == "sattr":
 
             self.NTB_main.select(5)
 
@@ -4220,105 +4375,198 @@ class scrObjEdit:
 
         self.getInitialValues(toEdit)
 
-    def getInitialValues(self, toEdit): #WIP
+    def getInitialValues(self, toEdit):
 
-        empty = list()
-        empty.append("")
+        section = toEdit[:-6]
 
-        # -- item --
+        if section == "item":
 
-        entryList = list()
+            entryList = list()
 
-        entryList.append(f"-- {lang['titleItem'].lower()} --")
+            self.ETY_nbtItemName.insert(tk.END, projectData["item"][toEdit]["name"])
 
-        for item in projectData["item"]:
+            image = projectData["item"][toEdit]["image"]
 
-            entryList.append(projectData["item"][item]["name"])
+            if image != "None":
 
-        self.CBB_nbtPortItemEntry.config(values = entryList)
-        self.CBB_nbtPortItemEntry.current(0)
+                self.ETY_nbtItemImageEntry.insert(tk.END, image)
 
-        # -- port --
+            for attr in projectData["attr"]:
 
-        entryList = list()
+                entryList.append(projectData["attr"][attr]["name"])
 
-        entryList.append(f"-- {lang['titlePort'].lower()} --")
+            self.CBB_nbtItemAttr.config(values = entryList)
 
-        for port in projectData["port"]:
+            self.CBB_nbtItemAttr.set(projectData["item"][toEdit]["attr"])
 
-            entryList.append(projectData["port"][port]["name"])
+            entryList.clear()
 
-        self.CBB_nbtItemPortEntry.config(values = entryList)
-        self.CBB_nbtItemPortEntry.current(0)
+            for attr in projectData["attr"]:
 
-        # -- attr --
+                if projectData["attr"][attr]["name"] == projectData["item"][toEdit]["attr"]:
 
-        entryList = list()
+                    attrID = attr
 
-        entryList.append(f"-- {lang['titleAttribute'].lower()} --")
+            for sattr in projectData["attr"][attrID]["sattr"]:
 
-        for attr in projectData["attr"]:
+                entryList.append(sattr)
 
-            entryList.append(projectData["attr"][attr]["name"])
+            entryList.insert(0, f"-- {lang['titleSubattribute'].lower()} --")
 
-        self.CBB_nbtItemAttr.config(values = entryList)
-        self.CBB_nbtItemAttr.current(0)
+            self.CBB_nbtItemSattr.config(values = entryList)
 
-        self.CBB_nbtSattrMaster.config(values = entryList)
-        self.CBB_nbtSattrMaster.current(0)
+            self.CBB_nbtItemSattr.set(projectData["item"][toEdit]["sattr"])
 
-        self.CBB_nbtItemSattr.config(values = empty)
-        self.CBB_nbtItemSattr.current(0)
-        self.CBB_nbtItemSattr.config(state = "disabled")
+            entryList.clear()
 
-        # -- area --
+            for port in projectData["item"][toEdit]["port"]:
 
-        entryList = list()
+                portName = port
+                portBuy, portSell = projectData["item"][toEdit]["port"][port].split("-")
 
-        entryList.append(f"-- {lang['titleArea'].lower()} --")
+                entryList.append((portName, portBuy, portSell))
 
-        for area in projectData["area"]:
+            for entry in entryList:
 
-            entryList.append(projectData["area"][area]["name"])
+                self.TRW_nbtItemPortTree.insert("", "end", values = entry)
 
-        self.CBB_nbtPortArea.config(values = entryList)
-        self.CBB_nbtPortArea.current(0)
+            entryList.clear()
 
-        self.CBB_nbtSareaMaster.config(values = entryList)
-        self.CBB_nbtSareaMaster.current(0)
+            entryList.append(f"-- {lang['titlePort'].lower()} --")
 
-        self.CBB_nbtPortSarea.config(values = empty)
-        self.CBB_nbtPortSarea.current(0)
-        self.CBB_nbtPortSarea.config(state = "disabled")
+            for port in projectData["port"]:
 
+                entryList.append(projectData["port"][port]["name"])
 
-        # -- other --
+            self.CBB_nbtItemPortEntry.config(values = entryList)
+            self.CBB_nbtItemPortEntry.current(0)
 
-        self.ETY_nbtItemName.delete(0, tk.END)
-        self.ETY_nbtItemImageEntry.delete(0, tk.END)
-        self.TRW_nbtItemPortTree.delete(*self.TRW_nbtItemPortTree.get_children())
+            self.BTN_nbtItemPortButtonsAdd.config(state = "disabled")
+            self.BTN_nbtItemPortButtonsRemove.config(state = "disabled")
 
-        self.ETY_nbtAttrName.delete(0, tk.END)
+        elif section == "area":
 
-        self.ETY_nbtSattrName.delete(0, tk.END)
+            self.ETY_nbtAreaName.insert(tk.END, projectData["area"][toEdit]["name"])
 
-        self.ETY_nbtPortName.delete(0, tk.END)
-        self.TRW_nbtPortItemTree.delete(*self.TRW_nbtPortItemTree.get_children())
+        elif section == "sarea":
 
-        self.ETY_nbtAreaName.delete(0, tk.END)
+            entryList = list()
 
-        self.ETY_nbtSareaName.delete(0, tk.END)
+            self.ETY_nbtSareaName.insert(tk.END, projectData["sarea"][toEdit]["name"])
 
-        self.ETY_nbtItemPortEntryValueBuy.delete(0, tk.END)
-        self.ETY_nbtItemPortEntryValueSell.delete(0, tk.END)
+            for area in projectData["area"]:
 
-        self.ETY_nbtPortItemEntryValueBuy.delete(0, tk.END)
-        self.ETY_nbtPortItemEntryValueBuy.delete(0, tk.END)
+                entryList.append(projectData["area"][area]["name"])
 
-        self.BTN_nbtItemPortButtonsAdd.config(state = "disabled")
-        self.BTN_nbtItemPortButtonsRemove.config(state = "disabled")
-        self.BTN_nbtPortItemButtonsAdd.config(state = "disabled")
-        self.BTN_nbtPortItemButtonsRemove.config(state = "disabled")
+            self.CBB_nbtSareaMaster.config(values = entryList)
+
+            for area in projectData["area"]:
+
+                for sarea in projectData["area"][area]["sarea"]:
+
+                    if sarea == projectData["sarea"][toEdit]["name"]:
+
+                        areaID = area
+
+            self.CBB_nbtSareaMaster.set(projectData["area"][areaID]["name"])
+
+        elif section == "port":
+
+            entryList = list()
+
+            self.ETY_nbtPortName.insert(tk.END, projectData["port"][toEdit]["name"])
+
+            for area in projectData["area"]:
+
+                entryList.append(projectData["area"][area]["name"])
+
+            self.CBB_nbtPortArea.config(values = entryList)
+
+            for sarea in projectData["sarea"]:
+
+                for entry in projectData["sarea"][sarea]["port"]:
+
+                    if entry == projectData["port"][toEdit]["name"]:
+
+                        sareaID = sarea
+
+            for area in projectData["area"]:
+
+                for entry in projectData["area"][area]["sarea"]:
+
+                    if entry == projectData["sarea"][sareaID]["name"]:
+
+                        areaID = area
+
+            entryList.clear()
+
+            for sarea in projectData["area"][areaID]["sarea"]:
+
+                entryList.append(sarea)
+
+            entryList.insert(0, f"-- {lang['titleSubarea'].lower()} --")
+
+            self.CBB_nbtPortSarea.config(values = entryList)
+
+            self.CBB_nbtPortArea.set(projectData["area"][areaID]["name"])
+            self.CBB_nbtPortSarea.set(projectData["sarea"][sareaID]["name"])
+
+            entryList.clear()
+
+            for item in projectData["item"]:
+
+                for port in projectData["item"][item]["port"]:
+
+                    if port == projectData["port"][toEdit]["name"]:
+
+                        itemName = projectData["item"][item]["name"]
+                        itemBuy, itemSell = projectData["item"][item]["port"][port].split("-")
+
+                        entryList.append((itemName, itemBuy, itemSell))
+
+            for entry in entryList:
+
+                self.TRW_nbtPortItemTree.insert("", "end", values = entry)
+
+            entryList = list()
+
+            entryList.append(f"-- {lang['titleItem'].lower()} --")
+
+            for item in projectData["item"]:
+
+                entryList.append(projectData["item"][item]["name"])
+
+            self.CBB_nbtPortItemEntry.config(values = entryList)
+            self.CBB_nbtPortItemEntry.current(0)
+
+            self.BTN_nbtPortItemButtonsAdd.config(state = "disabled")
+            self.BTN_nbtPortItemButtonsRemove.config(state = "disabled")
+
+        elif section == "attr":
+
+            self.ETY_nbtAttrName.insert(tk.END, projectData["attr"][toEdit]["name"])
+
+        elif section == "sattr":
+
+            entryList = list()
+
+            self.ETY_nbtSattrName.insert(tk.END, projectData["sattr"][toEdit]["name"])
+
+            for attr in projectData["attr"]:
+
+                entryList.append(projectData["attr"][attr]["name"])
+
+            self.CBB_nbtSattrMaster.config(values = entryList)
+
+            for attr in projectData["attr"]:
+
+                for sattr in projectData["attr"][attr]["sattr"]:
+
+                    if sattr == projectData["sattr"][toEdit]["name"]:
+
+                        attrID = attr
+
+            self.CBB_nbtSattrMaster.set(projectData["attr"][attrID]["name"])
 
     def CBB_nbtItemAttr_callback(self, event):
 
@@ -4483,7 +4731,7 @@ class scrObjEdit:
 
         self.BTN_nbtPortItemButtonsRemove.config(state = "disabled")
 
-    def buttonMainAdd(self):#to be edited
+    def buttonMainSave(self, toEdit):
 
         global projectChanges
 
@@ -4524,7 +4772,7 @@ class scrObjEdit:
 
             for item in projectData["item"]:
 
-                if str(projectData["item"][item]["name"]).lower() == itemName.lower():
+                if projectData["item"][item]["name"].lower() == itemName.lower() and projectData["item"][item]["name"].lower() != projectData["item"][toEdit]["name"].lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4534,40 +4782,13 @@ class scrObjEdit:
 
                     return -1
 
-            check = False
-            count = 0
+            projectData["item"][toEdit] = dict()
 
-            while check != True:
-
-                if count >= 1000000:
-
-                    return -1
-
-                itemID = f"item{count:06d}"
-
-                if itemID in projectData["item"]:
-
-                    count += 1
-
-                else:
-
-                    check = True
-
-            if check == False:
-
-                info = hand.general().getIniCont(infoPath)
-
-                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
-
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
-
-            projectData["item"][itemID] = dict()
-
-            projectData["item"][itemID]["name"] = itemName
-            projectData["item"][itemID]["image"] = itemImage
-            projectData["item"][itemID]["port"] = itemPort
-            projectData["item"][itemID]["attr"] = itemAttr
-            projectData["item"][itemID]["sattr"] = itemSattr
+            projectData["item"][toEdit]["name"] = itemName
+            projectData["item"][toEdit]["image"] = itemImage
+            projectData["item"][toEdit]["port"] = itemPort
+            projectData["item"][toEdit]["attr"] = itemAttr
+            projectData["item"][toEdit]["sattr"] = itemSattr
 
         elif active == 1: #area
 
@@ -4585,7 +4806,7 @@ class scrObjEdit:
 
             for area in projectData["area"]:
 
-                if str(projectData["area"][area]["name"]).lower() == areaName.lower():
+                if projectData["area"][area]["name"].lower() == areaName.lower() and projectData["area"][area]["name"].lower() != projectData["area"][toEdit]["name"].lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4595,37 +4816,10 @@ class scrObjEdit:
 
                     return -1
 
-            check = False
-            count = 0
+            projectData["area"][toEdit] = dict()
 
-            while check != True:
-
-                if count >= 1000000:
-
-                    return -1
-
-                areaID = f"area{count:06d}"
-
-                if areaID in projectData["area"]:
-
-                    count += 1
-
-                else:
-
-                    check = True
-
-            if check == False:
-
-                info = hand.general().getIniCont(infoPath)
-
-                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
-
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
-
-            projectData["area"][areaID] = dict()
-
-            projectData["area"][areaID]["name"] = areaName
-            projectData["area"][areaID]["sarea"] = list()
+            projectData["area"][toEdit]["name"] = areaName
+            projectData["area"][toEdit]["sarea"] = list()
 
         elif active == 2: #sarea
 
@@ -4644,7 +4838,7 @@ class scrObjEdit:
 
             for sarea in projectData["sarea"]:
 
-                if str(projectData["sarea"][sarea]["name"]).lower() == sareaName.lower():
+                if projectData["sarea"][sarea]["name"].lower() == sareaName.lower() and projectData["sarea"][sarea]["name"].lower() != projectData["sarea"][toEdit]["name"].lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4654,37 +4848,20 @@ class scrObjEdit:
 
                     return -1
 
-            check = False
-            count = 0
+            for area in projectData["area"]:
 
-            while check != True:
+                for sarea in projectData["area"][area]["sarea"]:
 
-                if count >= 1000000:
+                    if sarea == projectData["sarea"][toEdit]["name"]:
 
-                    return -1
+                        areaID = area
 
-                sareaID = f"sarea{count:06d}"
+            projectData["area"][areaID]["sarea"].remove(projectData["sarea"][toEdit]["name"])
 
-                if sareaID in projectData["sarea"]:
+            projectData["sarea"][toEdit] = dict()
 
-                    count += 1
-
-                else:
-
-                    check = True
-
-            if check == False:
-
-                info = hand.general().getIniCont(infoPath)
-
-                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
-
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
-
-            projectData["sarea"][sareaID] = dict()
-
-            projectData["sarea"][sareaID]["name"] = sareaName
-            projectData["sarea"][sareaID]["port"] = list()
+            projectData["sarea"][toEdit]["name"] = sareaName
+            projectData["sarea"][toEdit]["port"] = list()
 
             for area in projectData["area"]:
 
@@ -4692,7 +4869,7 @@ class scrObjEdit:
 
                     areaID = area
 
-            projectData["area"][areaID]["sarea"].append(sareaName)
+            projectData["area"][areaID]["sarear"].append(sareaName)
 
         elif active == 3: #port
 
@@ -4726,36 +4903,31 @@ class scrObjEdit:
 
                     projectData["sarea"][sarea]["port"].append(portName)
 
-            check = False
-            count = 0
-
-            while check != True:
-
-                if count >= 1000000:
-
-                    return -1
-
-                portID = f"port{count:06d}"
-
-                if portID in projectData["port"]:
-
-                    count += 1
-
-                else:
-
-                    check = True
-
-            if check == False:
+            if portName == "" or portArea == "" or portSarea == "":
 
                 info = hand.general().getIniCont(infoPath)
 
                 title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
 
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
+                messagebox.showinfo(title, lang["promptGeneralRequiredArguments"])
 
-            projectData["port"][portID] = dict()
+                return -1
 
-            projectData["port"][portID]["name"] = portName
+            for port in projectData["port"]:
+
+                if projectData["port"][port]["name"].lower() == portName.lower() and projectData["port"][port]["name"].lower() != projectData["port"][toEdit]["name"].lower():
+
+                    info = hand.general().getIniCont(infoPath)
+
+                    title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
+
+                    messagebox.showinfo(title, lang["promptGeneralNameTaken"])
+
+                    return -1
+
+            projectData["port"][toEdit] = dict()
+
+            projectData["port"][toEdit]["name"] = portName
 
         elif active == 4: #attr
 
@@ -4773,7 +4945,7 @@ class scrObjEdit:
 
             for attr in projectData["attr"]:
 
-                if str(projectData["attr"][attr]["name"]).lower() == attrName.lower():
+                if projectData["attr"][attr]["name"].lower() == attrName.lower() and projectData["attr"][attr]["name"].lower() != projectData["attr"][toEdit]["name"].lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4782,38 +4954,11 @@ class scrObjEdit:
                     messagebox.showinfo(title, lang["promptGeneralNameTaken"])
 
                     return -1
-
-            check = False
-            count = 0
-
-            while check != True:
-
-                if count >= 1000000:
-
-                    return -1
-
-                attrID = f"attr{count:06d}"
-
-                if attrID in projectData["attr"]:
-
-                    count += 1
-
-                else:
-
-                    check = True
-
-            if check == False:
-
-                info = hand.general().getIniCont(infoPath)
-
-                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
-
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
                     
-            projectData["attr"][attrID] = dict()
+            projectData["attr"][toEdit] = dict()
 
-            projectData["attr"][attrID]["name"] = attrName
-            projectData["attr"][attrID]["sattr"] = list()
+            projectData["attr"][toEdit]["name"] = attrName
+            projectData["attr"][toEdit]["sattr"] = list()
 
         elif active == 5: #sattr
 
@@ -4832,7 +4977,7 @@ class scrObjEdit:
 
             for sattr in projectData["sattr"]:
 
-                if str(projectData["sattr"][sattr]["name"]).lower() == sattrName.lower():
+                if projectData["sattr"][sattr]["name"].lower() == sattrName.lower() and projectData["sattr"][sattr]["name"].lower() != projectData["sattr"][toEdit]["name"].lower():
 
                     info = hand.general().getIniCont(infoPath)
 
@@ -4842,36 +4987,25 @@ class scrObjEdit:
 
                     return -1
 
-            check = False
-            count = 0
+            for attr in projectData["attr"]:
 
-            while check != True:
+                for sattr in projectData["attr"][attr]["sattr"]:
 
-                if count >= 1000000:
+                    if sattr == projectData["sattr"][toEdit]["name"]:
 
-                    return -1
+                        attrID = attr
 
-                sattrID = f"sattr{count:06d}"
+            projectData["attr"][attrID]["sattr"].remove(projectData["sattr"][toEdit]["name"])
 
-                if sattrID in projectData["sattr"]:
+            for item in projectData["item"]:
 
-                    count += 1
+                if projectData["item"][item]["sattr"] == projectData["sattr"][toEdit]["name"]:
 
-                else:
+                    projectData["item"][item]["attr"] = sattrMaster
 
-                    check = True
+            projectData["sattr"][toEdit] = dict()
 
-            if check == False:
-
-                info = hand.general().getIniCont(infoPath)
-
-                title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
-
-                messagebox.showerror(title, lang["promptGeneralTooManyEntries"])
-
-            projectData["sattr"][sattrID] = dict()
-
-            projectData["sattr"][sattrID]["name"] = sattrName
+            projectData["sattr"][toEdit]["name"] = sattrName
 
             for attr in projectData["attr"]:
 
@@ -4883,207 +5017,110 @@ class scrObjEdit:
 
         projectChanges = True
 
-        self.getInitialValues()
+        self.buttonMainClose()
 
     def buttonMainClose(self):
 
         self.master.destroy()
-
-"""
-class scrObjEdit:
-
-    def __init__(self, master, toEdit):
-
-        self.master = master
-        self.frame = ttk.Frame(self.master)
-
-        self.master.title(f"{lang['programName']} - {lang['promptObjectAdd']}")
-
-        self.frame.grid(column = 0, row = 0)
-
-        if toEdit == "item":
-            
-            ########################################
-            # --------- Creating Widgets --------- #
-            ########################################
-
-            # --- Register #01 - Items --- name, available Ports with value, attr, subattr
-
-            self.LBL_itemName = ttk.Label(self.frame, text = f"{lang['titleName']}:")
-            self.ETY_itemName = ttk.Entry(self.frame, width = 23)
-
-            self.FRM_itemImage = ttk.Frame(self.frame)
-
-            self.FRM_itemImage.columnconfigure(0, weight = 1)
-            self.FRM_itemImage.columnconfigure(1, weight = 1)
-
-            self.LBL_itemImage = ttk.Label(self.FRM_itemImage, text = f"{lang['titleImageFile']}:")
-
-            self.FRM_itemImageEntry = ttk.Frame(self.FRM_itemImage)
-
-            self.ETY_itemImageEntry = ttk.Entry(self.FRM_itemImageEntry, width = 18)
-            self.BTN_itemImageEntry = ttk.Button(self.FRM_itemImageEntry, text = "...", width = 3, command = self.buttonItemImage)
-
-            self.LBL_itemAttr = ttk.Label(self.frame, text = f"{lang['titleItem']}-{lang['titleAttribute']}:")
-            self.CBB_itemAttr = ttk.Combobox(self.frame, state = "readonly")
-
-            self.CBB_itemAttr.bind("<<ComboboxSelected>>", self.CBB_itemAttr_callback)
-
-            self.LBL_itemSattr = ttk.Label(self.frame, text = f"{lang['titleItem']}-{lang['titleSubattribute']}:")
-            self.CBB_itemSattr = ttk.Combobox(self.frame, state = "readonly")
-
-            self.FRM_itemPortTree = ttk.Frame(self.frame)
-
-            TRW_itemPortColumnList = (f"{lang['titlePort']}, {lang['titleBuy']}, {lang['titleSell']}")
-
-            self.TRW_itemPortTree = ttk.Treeview(self.FRM_itemPortTree, columns = TRW_itemPortColumnList, show = "headings", height = 10)
-
-            self.TRW_itemPortTree.heading(0, text = lang["titlePort"])
-            self.TRW_itemPortTree.column(0, width = 175)
-            self.TRW_itemPortTree.heading(1, text = lang["titleBuy"])
-            self.TRW_itemPortTree.column(1, width = 50)
-            self.TRW_itemPortTree.heading(2, text = lang["titleSell"])
-            self.TRW_itemPortTree.column(2, width = 50)
-
-            self.SLB_itemPortTree = ttk.Scrollbar(self.FRM_itemPortTree, orient = tk.VERTICAL, command = self.TRW_itemPortTree.yview)
-            self.TRW_itemPortTree["yscrollcommand"] = self.SLB_itemPortTree.set
-
-            self.TRW_itemPortTree.bind("<<TreeviewSelect>>", self.TRW_itemPortTree_callback)
-
-            self.FRM_itemPortEntry = ttk.Frame(self.frame)
-
-            self.FRM_itemPortEntry.columnconfigure(0, weight = 1)
-            self.FRM_itemPortEntry.columnconfigure(1, weight = 1)
-
-            self.CBB_itemPortEntry = ttk.Combobox(self.FRM_itemPortEntry, width = 24, state = "readonly")
-
-            self.CBB_itemPortEntry.bind("<<ComboboxSelected>>", self.CBB_itemPortEntry_callback)
-
-            self.FRM_itemPortEntryValue = ttk.Frame(self.FRM_itemPortEntry)
-
-            self.ETY_itemPortEntryValueBuy = ttk.Entry(self.FRM_itemPortEntryValue, width = 9)
-            self.ETY_itemPortEntryValueSell = ttk.Entry(self.FRM_itemPortEntryValue, width = 9)
-
-            self.FRM_itemPortButtons = ttk.Frame(self.frame)
-
-            self.FRM_itemPortButtons.columnconfigure(0, weight = 1)
-            self.FRM_itemPortButtons.columnconfigure(1, weight = 1)
-
-            self.BTN_itemPortButtonsAdd = ttk.Button(self.FRM_itemPortButtons, text = lang["buttonGeneralAdd"], width = 20, command = self.buttonItemAddPort)
-            self.BTN_itemPortButtonsRemove = ttk.Button(self.FRM_itemPortButtons, text = lang["buttonGeneralRemove"], width = 20, command = self.buttonItemRemovePort)
-
-            # --- Main Buttons ---
-
-            self.FRM_buttons = ttk.Frame(self.frame)
-
-            self.BTN_add = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralAdd"], command = self.buttonMainEdit)
-            self.BTN_close = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralClose"], command = self.buttonMainClose)
-
-            ######################################
-            # --------- Allign Widgets --------- #
-            ######################################
-
-            # --- Register #01 - Items ---
-            
-            self.LBL_itemName.grid(column = 0, row = 0, sticky = (tk.W), padx = 5, pady = 5)
-            self.ETY_itemName.grid(column = 1, row = 0, sticky = (tk.E), padx = 5, pady = 5)
-
-            self.FRM_itemImage.grid(column = 0, row = 1, columnspan = 2, sticky = (tk.W, tk.E), padx = 5, pady = 1)
-
-            self.LBL_itemImage.grid(column = 0, row = 0, sticky = (tk.W))
-
-            self.FRM_itemImageEntry.grid(column = 1, row = 0, sticky = (tk.E))
-
-            self.ETY_itemImageEntry.grid(column = 1, row = 0, padx = 2)
-            self.BTN_itemImageEntry.grid(column = 2, row = 0)
-
-            self.LBL_itemAttr.grid(column = 0, row = 2, sticky = (tk.W), padx = 5, pady = 2)
-            self.CBB_itemAttr.grid(column = 1, row = 2, sticky = (tk.E), padx = 5, pady = 2)
-
-            self.LBL_itemSattr.grid(column = 0, row = 3, sticky = (tk.W), padx = 5, pady = 2)
-            self.CBB_itemSattr.grid(column = 1, row = 3, sticky = (tk.E), padx = 5, pady = 2)
-
-            self.FRM_itemPortTree.grid(column = 0, row = 4, columnspan = 2, sticky = (tk.W, tk.E), padx = 5, pady = 2)
-
-            self.TRW_itemPortTree.grid(column = 0, row = 0)
-            self.SLB_itemPortTree.grid(column = 1, row = 0, sticky = (tk.N, tk.S))
-
-            self.FRM_itemPortEntry.grid(column = 0, row = 5, columnspan = 2, sticky = (tk.W, tk.E), padx = 5)
-
-            self.CBB_itemPortEntry.grid(column = 0, row = 0, sticky = (tk.W))
-
-            self.FRM_itemPortEntryValue.grid(column = 1, row = 0, sticky = (tk.E))
-
-            self.ETY_itemPortEntryValueBuy.grid(column = 0, row = 0, padx = 2)
-            self.ETY_itemPortEntryValueSell.grid(column = 1, row = 0, padx = 1)
-
-            self.FRM_itemPortButtons.grid(column = 0, row = 6, columnspan = 2, padx = 5, pady = 2)
-
-            self.BTN_itemPortButtonsAdd.grid(column = 0, row = 0)
-            self.BTN_itemPortButtonsRemove.grid(column = 1, row = 0)
-
-            # --- Main Buttons ---
-
-            self.BTN_add.grid(column = 0, row = 0)
-            self.BTN_close.grid(column = 1, row = 0)
-
-            self.FRM_buttons.grid(column = 0, row = 7, sticky = (tk.E), padx = 4, pady = 3)
-
-            # --- Main Frame ---
-
-            self.frame.grid(column = 0, row = 0)
-
-            # --- Final Pack
-
-            self.frame.pack()
-
-    def CBB_itemAttr_callback(self):
-
-        pass
-
-    def TRW_itemPortTree_callback(self):
-
-        pass
-
-    def CBB_itemPortEntry_callback(self):
-
-        pass
-
-    def buttonItemImage(self):
-
-        pass
-
-    def buttonItemAddPort(self):
-
-        pass
-
-    def buttonItemRemovePort(self):
-
-        pass
-
-    def buttonMainEdit(self):
-
-        pass
-
-    def buttonMainClose(self):
-
-        self.master.destroy()
-"""
 
 class scrSettings:
+
+    langDict = dict()
+    changeLang = False
 
     def __init__(self, master):
 
         self.master = master
         self.frame = ttk.Frame(self.master)
 
-        self.frame.grid(column = 0, row = 0)
+        self.LBL_language = ttk.Label(self.frame, text = lang["settingsLanguage"])
+        self.CBB_language = ttk.Combobox(self.frame, width = 18)
 
-        
+        self.CBB_language.bind("<<ComboboxSelected>>", self.CBB_language_callback)
+
+        self.FRM_buttons = ttk.Frame(self.frame)
+
+        self.BTN_save = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralSave"], command = self.buttonSave)
+        self.BTN_close = ttk.Button(self.FRM_buttons, text = lang["buttonGeneralClose"], command = self.buttonClose)
+
+        self.LBL_language.grid(column = 0, row = 0, sticky = (tk.W), pady = 5, padx = 5)
+        self.CBB_language.grid(column = 1, row = 0, sticky = (tk.E), pady = 5, padx = 5)
+
+        self.FRM_buttons.grid(column = 0, row = 1, columnspan = 2, sticky = (tk.E), pady = 5, padx = 5)
+
+        self.BTN_save.grid(column = 0, row = 0, sticky = (tk.W))
+        self.BTN_close.grid(column = 1, row = 0, sticky = (tk.E))
+
+        self.frame.grid(column = 0, row = 0)
 
         self.frame.pack()
 
-    def windowQuit(self):
+        self.getInitialValues()
+
+    def getInitialValues(self):
+
+        settings = hand.general().getIniCont(settingsPath)
+
+        langDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data\\lang")
+
+        langList = list()
+        self.langDict.clear()
+
+        for entry in os.listdir(langDir):
+
+            entryDir = os.path.join(langDir, entry)
+
+            try:
+
+                fileCont = hand.general().getIniCont(entryDir)
+
+                self.langDict[fileCont["fancyName"]] = os.path.splitext(os.path.basename(entryDir))[0]
+
+                langList.append(fileCont["fancyName"])
+
+            except:
+
+                pass
+
+        self.CBB_language.config(values = langList)
+        
+        for entry in self.langDict:
+
+            if self.langDict[entry] == settings["lang"]:
+
+                active = entry
+        
+        self.CBB_language.set(active)
+
+    def CBB_language_callback(self, event):
+
+        if self.changeLang == False:
+
+            self.changeLang = True
+
+            info = hand.general().getIniCont(infoPath)
+
+            title = f"{info['name']} - v. {info['ver']}.{info['subVer']}"
+
+            messagebox.showinfo(title, lang["promptSettingsLanguageChange"])
+
+    def buttonSave(self):
+
+        selectedLang = self.CBB_language.get()
+
+        for entry in self.langDict:
+
+            if entry == selectedLang:
+
+                langCode = self.langDict[entry]
+
+        content = (f"lang={langCode}\n")
+
+        hand.general().setIniCont(settingsPath, content)
+
+        self.buttonClose()
+
+    def buttonClose(self):
 
         self.master.destroy()
 
@@ -5093,62 +5130,3 @@ class scrSettings:
         
 if __name__ == '__main__':
     main()
-    
-    
-"""
-
-get item of a treeview
-
-active = self.TRW_nbtItemPortTree.selection()
-
-item = dict(self.TRW_nbtItemPortTree.item(active))["values"]
-
-print(item)    
-    
-    
-"""
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-#end
